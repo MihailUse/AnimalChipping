@@ -1,5 +1,7 @@
-﻿using Application.Interfaces;
+﻿using System.Reflection;
+using Application.Interfaces;
 using Application.Services;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -8,7 +10,10 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddAutoMapper(typeof(MappingProfile).Assembly);
+        var assembly = Assembly.GetExecutingAssembly();
+
+        services.AddAutoMapper(assembly);
+        services.AddValidatorsFromAssembly(assembly);
 
         services.AddScoped<IAccountService, AccountService>();
 

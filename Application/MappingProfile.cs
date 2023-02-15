@@ -8,7 +8,10 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        CreateProjection<Account, AccountModel>();
+
         CreateMap<CreateAccountModel, Account>();
         CreateMap<Account, AccountModel>();
+        CreateMap<AccountUpdateModel, Account>();
     }
 }
