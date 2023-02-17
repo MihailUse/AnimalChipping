@@ -22,6 +22,7 @@ public class ErrorHandlerMiddleware
         {
             var result = e switch
             {
+                InvalidOperationException => new StatusCodeResult(StatusCodes.Status400BadRequest),
                 AccessDenied => new StatusCodeResult(StatusCodes.Status403Forbidden),
                 NotFoundException => new StatusCodeResult(StatusCodes.Status404NotFound),
                 ConflictException => new StatusCodeResult(StatusCodes.Status409Conflict),

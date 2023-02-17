@@ -4,6 +4,7 @@ using FluentValidation.AspNetCore;
 using Infrastructure;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebApi.AuthenticationHandlers;
@@ -55,9 +56,6 @@ public abstract class Program
 
         builder.Services.AddAuthentication("BasicAuthentication")
             .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
-
-        // Configure services
-        builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
         var app = builder.Build();
         using (var scope = app.Services.CreateScope())

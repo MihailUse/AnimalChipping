@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
-[Route("[action]")]
 [ApiController]
+[Route("/")]
 public class AuthenticationController : ControllerBase
 {
     private readonly IAccountService _accountService;
@@ -15,10 +15,10 @@ public class AuthenticationController : ControllerBase
         _accountService = accountService;
     }
 
-    [HttpPost]
+    [HttpPost("registration")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Registration([FromBody] CreateAccountModel createAccountModel)
+    public async Task<IActionResult> Registration([FromBody] AccountCreateModel accountCreateModel)
     {
-        return Ok(await _accountService.CreateAccount(createAccountModel));
+        return Ok(await _accountService.Create(accountCreateModel));
     }
 }

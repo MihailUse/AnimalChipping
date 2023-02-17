@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Application.Models.Account;
 
-public class CreateAccountModelValidator : AbstractValidator<CreateAccountModel>
+public class CreateAccountModelValidator : AbstractValidator<AccountCreateModel>
 {
     public CreateAccountModelValidator()
     {

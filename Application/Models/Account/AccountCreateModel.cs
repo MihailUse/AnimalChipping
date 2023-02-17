@@ -1,6 +1,6 @@
 namespace Application.Models.Account;
 
-public class CreateAccountModel
+public class AccountCreateModel
 {
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;

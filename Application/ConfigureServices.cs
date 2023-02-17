@@ -16,6 +16,9 @@ public static class ConfigureServices
         services.AddValidatorsFromAssembly(assembly);
 
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<ILocationService, LocationService>();
+        services.AddScoped<IAnimalService, AnimalService>();
+        services.AddScoped<IAnimalTypeService, AnimalTypeService>();
 
         return services;
     }

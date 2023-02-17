@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-public class AccountService : IAccountService
+internal class AccountService : IAccountService
 {
     private readonly IMapper _mapper;
     private readonly IDatabaseContext _context;
@@ -28,21 +28,7 @@ public class AccountService : IAccountService
         _currentAccount = currentAccount;
     }
 
-    public async Task<AccountModel> CreateAccount(CreateAccountModel createModel)
-    {
-        var account = _mapper.Map<Account>(createModel);
-
-        var isExistsEmail = await _context.Accounts.AnyAsync(x => x.Email == account.Email);
-        if (isExistsEmail)
-            throw new ConflictException();
-
-        await _context.Accounts.AddAsync(account);
-        await _context.SaveChangesAsync();
-
-        return _mapper.Map<AccountModel>(account);
-    }
-
-    public async Task<AccountModel> GetAccount(int accountId)
+    public async Task<AccountModel> Get(int accountId)
     {
         var account = await _context.Accounts
             .ProjectTo<AccountModel>(_mapper.ConfigurationProvider)
@@ -74,14 +60,28 @@ public class AccountService : IAccountService
             .ProjectTo<AccountModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
-
-    public async Task<AccountModel> Update(int id, AccountUpdateModel updateModel)
+    
+    public async Task<AccountModel> Create(AccountCreateModel accountCreateModel)
     {
-        if (_currentAccount.Account?.Id == default)
+        var account = _mapper.Map<Account>(accountCreateModel);
+
+        var emailExists = await _context.Accounts.AnyAsync(x => x.Email == account.Email);
+        if (emailExists)
+            throw new ConflictException();
+
+        await _context.Accounts.AddAsync(account);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<AccountModel>(account);
+    }
+
+    public async Task<AccountModel> Update(int accountId, AccountUpdateModel updateModel)
+    {
+        if (_currentAccount.Account?.Id == default || _currentAccount.Account.Id != accountId)
             throw new AccessDenied();
 
         var account = _mapper.Map<Account>(updateModel);
-        account.Id = id;
+        account.Id = accountId;
 
         _context.Accounts.Update(account);
         await _context.SaveChangesAsync();
@@ -96,5 +96,18 @@ public class AccountService : IAccountService
             throw new NotFoundException();
 
         return account;
+    }
+
+    public async Task Delete(int accountId)
+    {
+        var account = await _context.Accounts.FindAsync(accountId);
+        if (account == default)
+            throw new NotFoundException();
+
+        if (_currentAccount.Account?.Id == default || _currentAccount.Account.Id != accountId)
+            throw new AccessDenied();
+
+        _context.Accounts.Remove(account);
+        await _context.SaveChangesAsync();
     }
 }
