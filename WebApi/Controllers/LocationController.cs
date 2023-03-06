@@ -2,10 +2,12 @@ using Application.Interfaces;
 using Application.Models.Location;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attributes;
 
 namespace WebApi.Controllers;
 
 [Authorize]
+[ValidateIdentifier]
 [ApiController]
 [Route("locations")]
 public class LocationController : ControllerBase
@@ -29,7 +31,7 @@ public class LocationController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LocationPointModel))]
     public async Task<IActionResult> Create([FromBody] LocationPointCreateModel locationPointCreateModel)
     {
-        return Ok(await _locationService.Create(locationPointCreateModel));
+        return StatusCode(StatusCodes.Status201Created, await _locationService.Create(locationPointCreateModel));
     }
 
     [HttpPut("{pointId:long}")]
@@ -41,7 +43,7 @@ public class LocationController : ControllerBase
 
     [HttpDelete("{pointId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async void Delete([FromRoute] long pointId)
+    public async Task Delete([FromRoute] long pointId)
     {
         await _locationService.Delete(pointId);
     }

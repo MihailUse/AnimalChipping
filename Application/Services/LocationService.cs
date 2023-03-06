@@ -26,17 +26,17 @@ internal class LocationService : ILocationService
             .FirstOrDefaultAsync(x => x.Id == locationId);
 
         if (location == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Location not found");
 
         return location;
     }
 
     public async Task<LocationPointModel> Create(LocationPointCreateModel createModel)
     {
-        var isExists = await _context.LocationPoints.AnyAsync(x =>
-            x.Longitude == createModel.Longitude && x.Latitude == createModel.Latitude);
+        var isExists = await _context.LocationPoints
+            .AnyAsync(x => x.Longitude == createModel.Longitude && x.Latitude == createModel.Latitude);
         if (isExists)
-            throw new ConflictException();
+            throw new ConflictException("Location already exists");
 
         var locationPoint = _mapper.Map<LocationPoint>(createModel);
         await _context.LocationPoints.AddAsync(locationPoint);
@@ -49,14 +49,14 @@ internal class LocationService : ILocationService
     {
         var location = await _context.LocationPoints.FindAsync(pointId);
         if (location == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Location not found");
 
         var isExists = await _context.LocationPoints.AnyAsync(x =>
             x.Id != pointId &&
             x.Latitude == updateModel.Latitude &&
             x.Longitude == updateModel.Longitude);
         if (isExists)
-            throw new ConflictException();
+            throw new ConflictException("Location already exists");
 
         location = _mapper.Map(updateModel, location);
         location.Id = pointId;
@@ -71,7 +71,7 @@ internal class LocationService : ILocationService
     {
         var location = await _context.LocationPoints.FindAsync(pointId);
         if (location == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Location not found");
 
         var hasAnimals = await _context.Animals.AnyAsync(x =>
             x.ChippingLocationId == pointId ||

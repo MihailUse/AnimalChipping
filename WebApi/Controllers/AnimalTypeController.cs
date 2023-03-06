@@ -2,10 +2,12 @@ using Application.Interfaces;
 using Application.Models.AnimalType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attributes;
 
 namespace WebApi.Controllers;
 
 [Authorize]
+[ValidateIdentifier]
 [ApiController]
 [Route("animals/types")]
 public class AnimalTypeController : ControllerBase
@@ -17,6 +19,7 @@ public class AnimalTypeController : ControllerBase
         _animalTypeService = animalTypeService;
     }
 
+    [AllowAnonymous]
     [HttpGet("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalTypeModel))]
     public async Task<IActionResult> Get([FromRoute] long typeId)
@@ -26,9 +29,9 @@ public class AnimalTypeController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalTypeModel))]
-    public async Task<IActionResult> Create([FromBody] AnimalTypeCreateModel createModel)
+    public async Task<IActionResult> Create([FromBody] AnimalCreateTypeModel model)
     {
-        return Ok(await _animalTypeService.Create(createModel));
+        return StatusCode(StatusCodes.Status201Created, await _animalTypeService.Create(model));
     }
 
     [HttpPut("{typeId:long}")]
@@ -40,7 +43,7 @@ public class AnimalTypeController : ControllerBase
 
     [HttpDelete("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async void Delete([FromRoute] long typeId)
+    public async Task Delete([FromRoute] long typeId)
     {
         await _animalTypeService.Delete(typeId);
     }

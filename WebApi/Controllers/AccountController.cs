@@ -2,9 +2,11 @@ using Application.Interfaces;
 using Application.Models.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Attributes;
 
 namespace WebApi.Controllers;
 
+[ValidateIdentifier]
 [ApiController]
 [Route("accounts")]
 public class AccountController : ControllerBase
@@ -41,7 +43,7 @@ public class AccountController : ControllerBase
     [Authorize]
     [HttpDelete("{accountId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async void Delete([FromRoute] int accountId)
+    public async Task Delete([FromRoute] int accountId)
     {
         await _accountService.Delete(accountId);
     }

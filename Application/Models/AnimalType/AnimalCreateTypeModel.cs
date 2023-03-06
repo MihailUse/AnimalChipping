@@ -1,6 +1,6 @@
 namespace Application.Models.AnimalType;
 
-public class AnimalTypeCreateModel
+public class AnimalCreateTypeModel
 {
     public string Type { get; set; } = null!;
 }

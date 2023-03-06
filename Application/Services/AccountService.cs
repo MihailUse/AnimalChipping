@@ -35,7 +35,7 @@ internal class AccountService : IAccountService
             .FirstOrDefaultAsync(x => x.Id == accountId);
 
         if (account == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Account not found");
 
         return account;
     }
@@ -60,14 +60,14 @@ internal class AccountService : IAccountService
             .ProjectTo<AccountModel>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
-    
+
     public async Task<AccountModel> Create(AccountCreateModel accountCreateModel)
     {
         var account = _mapper.Map<Account>(accountCreateModel);
 
         var emailExists = await _context.Accounts.AnyAsync(x => x.Email == account.Email);
         if (emailExists)
-            throw new ConflictException();
+            throw new ConflictException("Email already exists");
 
         await _context.Accounts.AddAsync(account);
         await _context.SaveChangesAsync();
@@ -77,8 +77,8 @@ internal class AccountService : IAccountService
 
     public async Task<AccountModel> Update(int accountId, AccountUpdateModel updateModel)
     {
-        if (_currentAccount.Account?.Id == default || _currentAccount.Account.Id != accountId)
-            throw new AccessDenied();
+        if (_currentAccount.Account?.Id == default || _currentAccount.Account!.Id != accountId)
+            throw new AccessDenied("Permission denied");
 
         var account = _mapper.Map<Account>(updateModel);
         account.Id = accountId;
@@ -93,7 +93,7 @@ internal class AccountService : IAccountService
     {
         var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
         if (account == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Account not found");
 
         return account;
     }
@@ -102,12 +102,17 @@ internal class AccountService : IAccountService
     {
         var account = await _context.Accounts.FindAsync(accountId);
         if (account == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Account not found");
 
-        if (_currentAccount.Account?.Id == default || _currentAccount.Account.Id != accountId)
-            throw new AccessDenied();
+        if (_currentAccount.Account?.Id == default || _currentAccount.Account!.Id != accountId)
+            throw new AccessDenied("Permission denied");
 
         _context.Accounts.Remove(account);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<bool> CheckExists(string email, string password)
+    {
+        return await _context.Accounts.AnyAsync(x => x.Email == email && x.Password == password);
     }
 }

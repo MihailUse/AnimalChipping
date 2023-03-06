@@ -70,7 +70,8 @@ public abstract class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseErrorHandlerMiddleware();
-
+        app.UseAuthenticateMiddleware();
+        
         app.MapControllers();
         app.Run();
     }

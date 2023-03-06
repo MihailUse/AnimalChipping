@@ -18,9 +18,6 @@ public class DatabaseContext : DbContext, IDatabaseContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AnimalVisitedLocation>()
-            .HasKey(x => new { x.AnimalId, x.LocationPointId });
-
         modelBuilder.Entity<Account>()
             .HasIndex(x => x.Email)
             .IsUnique();

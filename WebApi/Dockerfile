@@ -1,18 +1,29 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["WebApi/WebApi.csproj", "WebApi/"]
-RUN dotnet restore "WebApi/WebApi.csproj"
-COPY . .
+
+# copy csproj and restore as distinct layers
+COPY ["*.sln", "./"]
+COPY ["Infrastructure/*.csproj", "Infrastructure/"]
+COPY ["Application/*.csproj", "Application/"]
+COPY ["Domain/*.csproj", "Domain/"]
+COPY ["WebApi/*.csproj", "WebApi/"]
+RUN dotnet restore
+
+# copy everything else and build app
+COPY ["Infrastructure/*", "Infrastructure/"]
+COPY ["Application/*", "Application/"]
+COPY ["Domain/*", "Domain/"]
+COPY ["WebApi/*", "WebApi/"]
+
 WORKDIR "/src/WebApi"
-RUN dotnet build "WebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish --no-restore
 
 FROM base AS final
 WORKDIR /app

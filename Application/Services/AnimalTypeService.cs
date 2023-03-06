@@ -22,18 +22,18 @@ internal class AnimalTypeService : IAnimalTypeService
     {
         var type = await _context.AnimalTypes.FindAsync(typeId);
         if (type == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Type not found");
 
         return _mapper.Map<AnimalTypeModel>(type);
     }
 
-    public async Task<AnimalTypeModel> Create(AnimalTypeCreateModel createModel)
+    public async Task<AnimalTypeModel> Create(AnimalCreateTypeModel model)
     {
-        var typeExists = await _context.AnimalTypes.AnyAsync(x => x.Type == createModel.Type);
-        if (typeExists == default)
-            throw new ConflictException();
+        var typeExists = await _context.AnimalTypes.AnyAsync(x => x.Type == model.Type);
+        if (typeExists != default)
+            throw new ConflictException("Type already exists");
 
-        var type = _mapper.Map<AnimalType>(createModel);
+        var type = _mapper.Map<AnimalType>(model);
         await _context.AnimalTypes.AddAsync(type);
         await _context.SaveChangesAsync();
 
@@ -44,7 +44,7 @@ internal class AnimalTypeService : IAnimalTypeService
     {
         var existsType = await _context.AnimalTypes.FindAsync(typeId);
         if (existsType == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Type not found");
 
         var type = _mapper.Map(updateModel, existsType);
         type.Id = typeId;
@@ -59,7 +59,7 @@ internal class AnimalTypeService : IAnimalTypeService
     {
         var type = await _context.AnimalTypes.FindAsync(typeId);
         if (type == default)
-            throw new NotFoundException();
+            throw new NotFoundException("Type not found");
 
         var hasAnimals = await _context.AnimalTypes.AnyAsync(x => x.Animals.Any());
         if (hasAnimals)

@@ -11,4 +11,5 @@ public interface IAccountService
     Task<AccountModel> Update(int accountId, AccountUpdateModel updateModel);
     Task<Account> Authenticate(string email, string password);
     Task Delete(int accountId);
+    Task<bool> CheckExists(string email, string password);
 }
