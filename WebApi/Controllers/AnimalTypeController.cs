@@ -1,11 +1,11 @@
 using Application.Interfaces;
-using Application.Models.Account;
 using Application.Models.AnimalType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("animals/types")]
 public class AnimalTypeController : ControllerBase
@@ -24,7 +24,6 @@ public class AnimalTypeController : ControllerBase
         return Ok(await _animalTypeService.Get(typeId));
     }
 
-    [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalTypeModel))]
     public async Task<IActionResult> Create([FromBody] AnimalTypeCreateModel createModel)
@@ -32,7 +31,6 @@ public class AnimalTypeController : ControllerBase
         return Ok(await _animalTypeService.Create(createModel));
     }
 
-    [Authorize]
     [HttpPut("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalTypeModel))]
     public async Task<IActionResult> Update([FromRoute] long typeId, [FromBody] AnimalTypeUpdateModel updateModel)
@@ -40,7 +38,6 @@ public class AnimalTypeController : ControllerBase
         return Ok(await _animalTypeService.Update(typeId, updateModel));
     }
 
-    [Authorize]
     [HttpDelete("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async void Delete([FromRoute] long typeId)

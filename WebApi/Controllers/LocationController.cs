@@ -17,6 +17,7 @@ public class LocationController : ControllerBase
         _locationService = locationService;
     }
 
+    [AllowAnonymous]
     [HttpGet("{locationId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationPointModel))]
     public async Task<IActionResult> Get([FromRoute] int locationId)
@@ -24,7 +25,6 @@ public class LocationController : ControllerBase
         return Ok(await _locationService.Get(locationId));
     }
 
-    [Authorize]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LocationPointModel))]
     public async Task<IActionResult> Create([FromBody] LocationPointCreateModel locationPointCreateModel)
@@ -32,7 +32,6 @@ public class LocationController : ControllerBase
         return Ok(await _locationService.Create(locationPointCreateModel));
     }
 
-    [Authorize]
     [HttpPut("{pointId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationPointModel))]
     public async Task<IActionResult> Update([FromRoute] long pointId, [FromBody] LocationPointUpdateModel updateModel)
@@ -40,7 +39,6 @@ public class LocationController : ControllerBase
         return Ok(await _locationService.Update(pointId, updateModel));
     }
 
-    [Authorize]
     [HttpDelete("{pointId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async void Delete([FromRoute] long pointId)

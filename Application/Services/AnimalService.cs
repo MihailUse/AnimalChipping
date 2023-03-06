@@ -1,7 +1,6 @@
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Animal;
-using Application.Models.AnimalType;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Domain.Entities;
