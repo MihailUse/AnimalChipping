@@ -2,9 +2,9 @@ using FluentValidation;
 
 namespace Application.Models.Account;
 
-public class CreateAccountModelValidator : AbstractValidator<AccountCreateModel>
+public class AccountCreateModelValidator : AbstractValidator<AccountCreateModel>
 {
-    public CreateAccountModelValidator()
+    public AccountCreateModelValidator()
     {
         RuleFor(x => x.FirstName).NotEmpty();
         RuleFor(x => x.LastName).NotEmpty();

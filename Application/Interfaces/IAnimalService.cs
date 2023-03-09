@@ -18,5 +18,5 @@ public interface IAnimalService
     Task<List<AnimalVisitedLocationModel>> SearchLocation(long animalId, AnimalSearchLocationModel searchLocationModel);
     Task<AnimalVisitedLocationModel> AddLocation(long animalId, long pointId);
     Task<AnimalVisitedLocationModel> UpdateLocation(long animalId, AnimalUpdateLocationModel updateLocationModel);
-    Task DeleteLocation(long animalId, long visitedPointId);
+    Task DeleteLocation(long animalId, long visitedLocationPointId);
 }

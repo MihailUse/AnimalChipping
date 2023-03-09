@@ -22,10 +22,11 @@ public class ErrorHandlerMiddleware
         }
         catch (Exception e)
         {
-            ObjectResult result = e switch
+            var result = e switch
             {
                 InvalidOperationException => new BadRequestObjectResult(e.Message),
-                AccessDenied => new UnauthorizedObjectResult(e.Message) { StatusCode = StatusCodes.Status403Forbidden },
+                UnauthorizedException => new UnauthorizedObjectResult(e.Message),
+                ForbiddenException => new ObjectResult(e.Message) { StatusCode = StatusCodes.Status403Forbidden },
                 NotFoundException => new NotFoundObjectResult(e.Message),
                 ConflictException => new ConflictObjectResult(e.Message),
                 _ => new ObjectResult(null) { StatusCode = StatusCodes.Status500InternalServerError }

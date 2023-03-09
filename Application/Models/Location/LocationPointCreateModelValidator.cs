@@ -7,11 +7,11 @@ public class LocationPointCreateModelValidator : AbstractValidator<LocationPoint
     public LocationPointCreateModelValidator()
     {
         RuleFor(x => x.Latitude)
-            .LessThan(90)
-            .GreaterThan(-90);
+            .LessThanOrEqualTo(90)
+            .GreaterThanOrEqualTo(-90);
 
         RuleFor(x => x.Longitude)
-            .LessThan(180)
-            .GreaterThan(-180);
+            .LessThanOrEqualTo(180)
+            .GreaterThanOrEqualTo(-180);
     }
 }

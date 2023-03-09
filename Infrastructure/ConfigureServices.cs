@@ -17,8 +17,6 @@ public static class ConfigureServices
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
                 builder => builder.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
 
-        services.AddSingleton<IDatabaseFunctions, DatabaseFunctions>();
-
         return services;
     }
 }

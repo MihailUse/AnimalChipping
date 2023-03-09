@@ -20,8 +20,8 @@ public class AnimalUpdateModelValidator : AbstractValidator<AnimalUpdateModel>
         RuleFor(x => x.ChippingLocationId)
             .GreaterThan(0);
         RuleFor(x => x.Gender)
-            .Must(x => Enum.IsDefined(typeof(AnimalGender), x));
+            .Must(x => x != null && Enum.IsDefined(typeof(AnimalGender), x));
         RuleFor(x => x.LifeStatus)
-            .Must(x => Enum.IsDefined(typeof(AnimalLifeStatus), x));
+            .Must(x => x != null && Enum.IsDefined(typeof(AnimalLifeStatus), x));
     }
 }

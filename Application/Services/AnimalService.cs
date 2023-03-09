@@ -12,23 +12,23 @@ namespace Application.Services;
 internal class AnimalService : IAnimalService
 {
     private readonly IMapper _mapper;
-    private readonly IDatabaseContext _context;
+    private readonly IDatabaseContext _database;
 
-    public AnimalService(IMapper mapper, IDatabaseContext context)
+    public AnimalService(IMapper mapper, IDatabaseContext database)
     {
         _mapper = mapper;
-        _context = context;
+        _database = database;
     }
 
     public async Task<AnimalModel> Get(long animalId)
     {
-        var animal = await FindAnimal(animalId);
+        var animal = await FindFullAnimal(animalId);
         return _mapper.Map<AnimalModel>(animal);
     }
 
     public async Task<List<AnimalModel>> Search(AnimalSearchModel searchModel)
     {
-        IQueryable<Animal> query = _context.Animals;
+        IQueryable<Animal> query = _database.Animals;
 
         if (searchModel.ChipperId != default)
             query = query.Where(x => x.ChipperId == searchModel.ChipperId);
@@ -63,18 +63,18 @@ internal class AnimalService : IAnimalService
         if (hasDuplicates)
             throw new ConflictException("AnimalTypes has duplicates");
 
-        var existsAnimalTypes = await _context.AnimalTypes
+        var existsAnimalTypes = await _database.AnimalTypes
             .Where(x => createModel.AnimalTypes.Contains(x.Id))
             .ToListAsync();
         if (existsAnimalTypes.Count != createModel.AnimalTypes.Count)
             throw new NotFoundException("AnimalType not found");
 
         // check account exists and location exists
-        var accountExists = await _context.Accounts.AnyAsync(x => x.Id == createModel.ChipperId);
+        var accountExists = await _database.Accounts.AnyAsync(x => x.Id == createModel.ChipperId);
         if (accountExists == default)
             throw new NotFoundException("Account not found");
 
-        var locationExists = await _context.LocationPoints.AnyAsync(x => x.Id == createModel.ChippingLocationId);
+        var locationExists = await _database.LocationPoints.AnyAsync(x => x.Id == createModel.ChippingLocationId);
         if (locationExists == default)
             throw new NotFoundException("Location not found");
 
@@ -82,8 +82,8 @@ internal class AnimalService : IAnimalService
         var animal = _mapper.Map<Animal>(createModel);
         animal.AnimalTypes = existsAnimalTypes;
 
-        await _context.Animals.AddAsync(animal);
-        await _context.SaveChangesAsync();
+        await _database.Animals.AddAsync(animal);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AnimalModel>(animal);
     }
@@ -94,24 +94,33 @@ internal class AnimalService : IAnimalService
 
         if (animal.ChipperId != updateModel.ChipperId)
         {
-            var accountExists = await _context.Accounts.AnyAsync(x => x.Id == updateModel.ChipperId);
+            var accountExists = await _database.Accounts.AnyAsync(x => x.Id == updateModel.ChipperId);
             if (accountExists == default)
                 throw new NotFoundException("Account not found");
         }
 
         if (animal.ChippingLocationId != updateModel.ChippingLocationId)
         {
-            var locationExists = await _context.LocationPoints.AnyAsync(x => x.Id == updateModel.ChippingLocationId);
+            var locationExists = await _database.LocationPoints.AnyAsync(x => x.Id == updateModel.ChippingLocationId);
             if (locationExists == default)
                 throw new NotFoundException("Location not found");
+
+            var firstLocation = await _database.AnimalVisitedLocations
+                .OrderBy(x => x.DateTimeOfVisitLocationPoint)
+                .FirstOrDefaultAsync(x => x.AnimalId == animalId);
+            if (firstLocation?.LocationPointId == updateModel.ChippingLocationId)
+                throw new InvalidOperationException();
         }
 
         animal = _mapper.Map(updateModel, animal);
 
-        _context.Animals.Update(animal);
-        await _context.SaveChangesAsync();
+        if (animal.LifeStatus == Animal.AnimalLifeStatus.DEAD && !animal.DeathDateTime.HasValue)
+            animal.DeathDateTime = DateTime.UtcNow;
 
-        return await _context.Animals
+        _database.Animals.Update(animal);
+        await _database.SaveChangesAsync();
+
+        return await _database.Animals
             .ProjectTo<AnimalModel>(_mapper.ConfigurationProvider)
             .FirstAsync(x => x.Id == animalId);
     }
@@ -119,8 +128,13 @@ internal class AnimalService : IAnimalService
     public async Task Delete(long animalId)
     {
         var animal = await FindAnimal(animalId);
-        _context.Animals.Remove(animal);
-        await _context.SaveChangesAsync();
+
+        var hasVisitedLocation = await _database.AnimalVisitedLocations.AnyAsync(x => x.AnimalId == animalId);
+        if (hasVisitedLocation)
+            throw new InvalidOperationException();
+
+        _database.Animals.Remove(animal);
+        await _database.SaveChangesAsync();
     }
 
     #region AnimalType
@@ -129,7 +143,7 @@ internal class AnimalService : IAnimalService
     {
         var animal = await FindFullAnimal(animalId);
 
-        var animalType = await _context.AnimalTypes.FindAsync(typeId);
+        var animalType = await _database.AnimalTypes.FindAsync(typeId);
         if (animalType == default)
             throw new NotFoundException("AnimalType not found");
 
@@ -137,8 +151,8 @@ internal class AnimalService : IAnimalService
             throw new ConflictException("Animal already contains type");
 
         animal.AnimalTypes.Add(animalType);
-        _context.Animals.Update(animal);
-        await _context.SaveChangesAsync();
+        _database.Animals.Update(animal);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AnimalModel>(animal);
     }
@@ -155,13 +169,13 @@ internal class AnimalService : IAnimalService
         if (typeAlreadyExists)
             throw new ConflictException("New type already exists");
 
-        var newAnimalType = await _context.AnimalTypes.FindAsync(updateTypeModel.NewTypeId);
+        var newAnimalType = await _database.AnimalTypes.FindAsync(updateTypeModel.NewTypeId);
         if (newAnimalType == default)
             throw new NotFoundException("New Type not found");
 
         animal.AnimalTypes.Add(newAnimalType);
-        _context.Animals.Update(animal);
-        await _context.SaveChangesAsync();
+        _database.Animals.Update(animal);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AnimalModel>(animal);
     }
@@ -170,12 +184,15 @@ internal class AnimalService : IAnimalService
     {
         var animal = await FindFullAnimal(animalId);
 
+        if (animal.AnimalTypes.Count == 1)
+            throw new InvalidOperationException();
+
         var removedTypes = animal.AnimalTypes.RemoveAll(x => x.Id == typeId);
         if (removedTypes == 0)
             throw new NotFoundException("AnimalType not found");
 
-        _context.Animals.Remove(animal);
-        await _context.SaveChangesAsync();
+        _database.Animals.Update(animal);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AnimalModel>(animal);
     }
@@ -189,7 +206,7 @@ internal class AnimalService : IAnimalService
         AnimalSearchLocationModel searchLocationModel
     )
     {
-        var query = _context.AnimalVisitedLocations.Where(x => x.AnimalId == animalId);
+        var query = _database.AnimalVisitedLocations.Where(x => x.AnimalId == animalId);
 
         if (searchLocationModel.StartDateTime != default)
             query = query.Where(x => x.DateTimeOfVisitLocationPoint < searchLocationModel.StartDateTime);
@@ -198,7 +215,7 @@ internal class AnimalService : IAnimalService
             query = query.Where(x => x.DateTimeOfVisitLocationPoint > searchLocationModel.EndDateTime);
 
         return await query
-            .OrderByDescending(x => x.DateTimeOfVisitLocationPoint)
+            .OrderBy(x => x.Id)
             .Skip(searchLocationModel.From)
             .Take(searchLocationModel.Size)
             .ProjectTo<AnimalVisitedLocationModel>(_mapper.ConfigurationProvider)
@@ -207,7 +224,7 @@ internal class AnimalService : IAnimalService
 
     public async Task<AnimalVisitedLocationModel> AddLocation(long animalId, long pointId)
     {
-        var animal = await _context.Animals
+        var animal = await _database.Animals
             .Include(x => x.VisitedLocations)
             .FirstOrDefaultAsync(x => x.Id == animalId);
         if (animal == default)
@@ -216,15 +233,23 @@ internal class AnimalService : IAnimalService
         if (animal.LifeStatus == Animal.AnimalLifeStatus.DEAD)
             throw new InvalidOperationException();
 
-        var location = await _context.LocationPoints.FindAsync(pointId);
+        var location = await _database.LocationPoints.FindAsync(pointId);
         if (location == default)
             throw new NotFoundException("Location not found");
 
-        var lastVisitedLocation = animal.VisitedLocations
-            .OrderByDescending(x => x.DateTimeOfVisitLocationPoint)
-            .First();
-        if (lastVisitedLocation.LocationPointId == pointId)
-            throw new InvalidOperationException("Point already exists");
+        if (animal.VisitedLocations.Count > 0)
+        {
+            var lastVisitedLocation = animal.VisitedLocations
+                .OrderByDescending(x => x.DateTimeOfVisitLocationPoint)
+                .First();
+            if (lastVisitedLocation.LocationPointId == pointId)
+                throw new InvalidOperationException("Point already exists");
+        }
+        else
+        {
+            if (animal.ChippingLocationId == pointId)
+                throw new InvalidOperationException("ChippingLocationId equals new point id");
+        }
 
         var animalVisitedLocation = new AnimalVisitedLocation()
         {
@@ -232,8 +257,8 @@ internal class AnimalService : IAnimalService
             LocationPoint = location
         };
 
-        await _context.AnimalVisitedLocations.AddAsync(animalVisitedLocation);
-        await _context.SaveChangesAsync();
+        await _database.AnimalVisitedLocations.AddAsync(animalVisitedLocation);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AnimalVisitedLocationModel>(animalVisitedLocation);
     }
@@ -243,49 +268,84 @@ internal class AnimalService : IAnimalService
         AnimalUpdateLocationModel updateLocationModel
     )
     {
-        var animal = await _context.Animals
-            .Include(x => x.VisitedLocations)
+        var animal = await _database.Animals
+            .Include(x => x.VisitedLocations.OrderBy(l => l.DateTimeOfVisitLocationPoint))
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == animalId);
+        if (animal == default)
+            throw new NotFoundException("Animal not found");
+        
+        // check new location point exists
+        var location = await _database.LocationPoints.FindAsync(updateLocationModel.LocationPointId);
+        if (location == default)
+            throw new NotFoundException("Location not found");
+
+        // get visitedLocation for update  
+        var visitedLocation = animal.VisitedLocations
+            .FirstOrDefault(x => x.Id == updateLocationModel.VisitedLocationPointId);
+        if (visitedLocation == default)
+            throw new NotFoundException("Visited location not found");
+
+        if (visitedLocation.LocationPointId == updateLocationModel.LocationPointId)
+            throw new InvalidOperationException("Location already exists");
+
+        // check last visited point
+        var lastVisitedLocation = animal.VisitedLocations
+            .LastOrDefault(x => x.DateTimeOfVisitLocationPoint < visitedLocation.DateTimeOfVisitLocationPoint);
+        if (lastVisitedLocation?.LocationPointId == updateLocationModel.LocationPointId)
+            throw new InvalidOperationException();
+
+        // check next visited point
+        var nextVisitedLocation = animal.VisitedLocations
+            .FirstOrDefault(x => x.DateTimeOfVisitLocationPoint > visitedLocation.DateTimeOfVisitLocationPoint);
+        if (nextVisitedLocation?.LocationPointId == updateLocationModel.LocationPointId)
+            throw new InvalidOperationException();
+
+        // check ChippingLocationId not equals new location id 
+        if (lastVisitedLocation == default && animal.ChippingLocationId == updateLocationModel.LocationPointId)
+            throw new InvalidOperationException();
+
+        visitedLocation.LocationPointId = updateLocationModel.LocationPointId;
+        _database.AnimalVisitedLocations.Update(visitedLocation);
+        await _database.SaveChangesAsync();
+
+        return _mapper.Map<AnimalVisitedLocationModel>(visitedLocation);
+    }
+
+    public async Task DeleteLocation(long animalId, long visitedLocationPointId)
+    {
+        var animal = await _database.Animals
+            .Include(x => x.VisitedLocations.OrderBy(l => l.DateTimeOfVisitLocationPoint))
             .FirstOrDefaultAsync(x => x.Id == animalId);
         if (animal == default)
             throw new NotFoundException("Animal not found");
 
-        var location = await _context.LocationPoints.FindAsync(updateLocationModel.LocationPointId);
-        if (location == default)
-            throw new NotFoundException("Location not found");
-
-        var oldAnimalVisitedLocation = animal.VisitedLocations
-            .Find(x => x.Id == updateLocationModel.VisitedLocationPointId);
-        if (oldAnimalVisitedLocation == default)
-            throw new NotFoundException("Old visited location not found");
-
-        var animalVisitedLocation = new AnimalVisitedLocation()
-        {
-            Animal = animal,
-            LocationPoint = location
-        };
-
-        _context.AnimalVisitedLocations.Remove(oldAnimalVisitedLocation);
-        await _context.AnimalVisitedLocations.AddAsync(animalVisitedLocation);
-        await _context.SaveChangesAsync();
-
-        return _mapper.Map<AnimalVisitedLocationModel>(animalVisitedLocation);
-    }
-
-    public async Task DeleteLocation(long animalId, long visitedPointId)
-    {
-        var animalVisitedLocation = await _context.AnimalVisitedLocations.FindAsync(visitedPointId);
-        if (animalVisitedLocation == default)
+        var visitedLocation = animal.VisitedLocations.FirstOrDefault(x => x.Id == visitedLocationPointId);
+        if (visitedLocation == default)
             throw new NotFoundException("Visited location not found");
 
-        _context.AnimalVisitedLocations.Remove(animalVisitedLocation);
-        await _context.SaveChangesAsync();
+        // check locations are not repeated
+        var lastVisitedLocation = animal.VisitedLocations
+            .LastOrDefault(x => x.DateTimeOfVisitLocationPoint < visitedLocation.DateTimeOfVisitLocationPoint);
+        var nextVisitedLocation = animal.VisitedLocations
+            .FirstOrDefault(x => x.DateTimeOfVisitLocationPoint > visitedLocation.DateTimeOfVisitLocationPoint);
+        if ((lastVisitedLocation != default || nextVisitedLocation != default) &&
+            lastVisitedLocation?.LocationPointId == nextVisitedLocation?.LocationPointId)
+            throw new InvalidOperationException();
+
+        // check ChippingLocationId not equals first location id
+        if (nextVisitedLocation?.LocationPointId == animal.ChippingLocationId)
+            _database.AnimalVisitedLocations.Remove(nextVisitedLocation);
+
+        _database.AnimalVisitedLocations.Remove(visitedLocation);
+        await _database.SaveChangesAsync();
     }
 
     #endregion
 
     private async Task<Animal> FindFullAnimal(long animalId)
     {
-        var animal = await _context.Animals
+        var animal = await _database.Animals
             .Include(x => x.AnimalTypes)
             .Include(x => x.VisitedLocations)
             .FirstOrDefaultAsync(x => x.Id == animalId);
@@ -297,7 +357,7 @@ internal class AnimalService : IAnimalService
 
     private async Task<Animal> FindAnimal(long animalId)
     {
-        var animal = await _context.Animals.FindAsync(animalId);
+        var animal = await _database.Animals.FindAsync(animalId);
         if (animal == default)
             throw new NotFoundException("Animal not found");
 

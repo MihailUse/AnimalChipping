@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Application.Models.AnimalType;
 
-public class AnimalTypeCreateModelValidator : AbstractValidator<AnimalCreateTypeModel>
+public class AnimalTypeCreateModelValidator : AbstractValidator<AnimalTypeCreateModel>
 {
     public AnimalTypeCreateModelValidator()
     {

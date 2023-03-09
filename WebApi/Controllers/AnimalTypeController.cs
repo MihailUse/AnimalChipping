@@ -29,7 +29,7 @@ public class AnimalTypeController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalTypeModel))]
-    public async Task<IActionResult> Create([FromBody] AnimalCreateTypeModel model)
+    public async Task<IActionResult> Create([FromBody] AnimalTypeCreateModel model)
     {
         return StatusCode(StatusCodes.Status201Created, await _animalTypeService.Create(model));
     }

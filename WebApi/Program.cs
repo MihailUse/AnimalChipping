@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using WebApi.AuthenticationHandlers;
+using WebApi.Converters;
 using WebApi.Middlewares;
 using WebApi.Services;
 
@@ -24,14 +25,15 @@ public abstract class Program
         builder.Services.AddScoped<ICurrentAccount, CurrentAccountService>();
 
         builder.Services.AddFluentValidationAutoValidation();
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new DateTimeConverter()));
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.AddSecurityDefinition("basic", new OpenApiSecurityScheme
+            options.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
-                Scheme = "basic",
+                Scheme = "Basic",
                 Type = SecuritySchemeType.Http,
                 In = ParameterLocation.Header,
                 Description = "Basic Authorization header using the Bearer scheme."
@@ -45,7 +47,7 @@ public abstract class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "basic"
+                            Id = "Basic"
                         }
                     },
                     new string[] { }
@@ -71,7 +73,7 @@ public abstract class Program
         app.UseAuthorization();
         app.UseErrorHandlerMiddleware();
         app.UseAuthenticateMiddleware();
-        
+
         app.MapControllers();
         app.Run();
     }

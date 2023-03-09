@@ -16,7 +16,7 @@ public class AuthenticateMiddleware
 
     public async Task Invoke(HttpContext httpContext, IAccountService accountService)
     {
-        var hasHeader = AuthenticationHeaderValue.TryParse(httpContext.Request.Headers["Authorization"], out var authHeader);
+        var hasHeader = AuthenticationHeaderValue.TryParse(httpContext.Request.Headers.Authorization, out var authHeader);
         if (hasHeader && authHeader!.Parameter != default)
         {
             var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
@@ -26,7 +26,7 @@ public class AuthenticateMiddleware
 
             var accountExists = await accountService.CheckExists(email, password);
             if (!accountExists)
-                throw new AccessDenied("Invalid credentials");
+                throw new UnauthorizedException("Invalid credentials");
         }
 
         await _next(httpContext);

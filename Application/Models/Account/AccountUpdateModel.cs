@@ -1,8 +1,5 @@
 namespace Application.Models.Account;
 
-public class AccountUpdateModel
+public class AccountUpdateModel : AccountCreateModel
 {
-    public string FirstName { get; set; } = null!;
-    public string LastName { get; set; } = null!;
-    public string Email { get; set; } = null!;
 }

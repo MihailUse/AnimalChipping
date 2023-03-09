@@ -11,26 +11,23 @@ namespace Application.Services;
 internal class AccountService : IAccountService
 {
     private readonly IMapper _mapper;
-    private readonly IDatabaseContext _context;
-    private readonly IDatabaseFunctions _databaseFunctions;
+    private readonly IDatabaseContext _database;
     private readonly ICurrentAccount _currentAccount;
 
     public AccountService(
         IMapper mapper,
-        IDatabaseContext context,
-        IDatabaseFunctions databaseFunctions,
+        IDatabaseContext database,
         ICurrentAccount currentAccount
     )
     {
         _mapper = mapper;
-        _context = context;
-        _databaseFunctions = databaseFunctions;
+        _database = database;
         _currentAccount = currentAccount;
     }
 
     public async Task<AccountModel> Get(int accountId)
     {
-        var account = await _context.Accounts
+        var account = await _database.Accounts
             .ProjectTo<AccountModel>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(x => x.Id == accountId);
 
@@ -42,16 +39,16 @@ internal class AccountService : IAccountService
 
     public async Task<List<AccountModel>> Search(AccountSearchModel searchModel)
     {
-        IQueryable<Account> query = _context.Accounts;
+        IQueryable<Account> query = _database.Accounts;
 
         if (searchModel.FirstName != default)
-            query = query.Where(x => _databaseFunctions.ILike(x.FirstName, $"%{searchModel.FirstName}%"));
+            query = query.Where(x => EF.Functions.ILike(x.FirstName, $"%{searchModel.FirstName}%"));
 
         if (searchModel.LastName != default)
-            query = query.Where(x => _databaseFunctions.ILike(x.LastName, $"%{searchModel.LastName}%"));
+            query = query.Where(x => EF.Functions.ILike(x.LastName, $"%{searchModel.LastName}%"));
 
         if (searchModel.Email != default)
-            query = query.Where(x => _databaseFunctions.ILike(x.Email, $"%{searchModel.Email}%"));
+            query = query.Where(x => EF.Functions.ILike(x.Email, $"%{searchModel.Email}%"));
 
         return await query
             .OrderBy(x => x.Id)
@@ -65,33 +62,30 @@ internal class AccountService : IAccountService
     {
         var account = _mapper.Map<Account>(accountCreateModel);
 
-        var emailExists = await _context.Accounts.AnyAsync(x => x.Email == account.Email);
+        var emailExists = await _database.Accounts.AnyAsync(x => x.Email == account.Email);
         if (emailExists)
             throw new ConflictException("Email already exists");
 
-        await _context.Accounts.AddAsync(account);
-        await _context.SaveChangesAsync();
+        await _database.Accounts.AddAsync(account);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AccountModel>(account);
     }
 
     public async Task<AccountModel> Update(int accountId, AccountUpdateModel updateModel)
     {
-        if (_currentAccount.Account?.Id == default || _currentAccount.Account!.Id != accountId)
-            throw new AccessDenied("Permission denied");
+        var account = await FindAccount(accountId);
+        account = _mapper.Map(updateModel, account);
 
-        var account = _mapper.Map<Account>(updateModel);
-        account.Id = accountId;
-
-        _context.Accounts.Update(account);
-        await _context.SaveChangesAsync();
+        _database.Accounts.Update(account!);
+        await _database.SaveChangesAsync();
 
         return _mapper.Map<AccountModel>(account);
     }
 
     public async Task<Account> Authenticate(string email, string password)
     {
-        var account = await _context.Accounts.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
+        var account = await _database.Accounts.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
         if (account == default)
             throw new NotFoundException("Account not found");
 
@@ -100,19 +94,27 @@ internal class AccountService : IAccountService
 
     public async Task Delete(int accountId)
     {
-        var account = await _context.Accounts.FindAsync(accountId);
-        if (account == default)
-            throw new NotFoundException("Account not found");
+        var account = await FindAccount(accountId);
 
-        if (_currentAccount.Account?.Id == default || _currentAccount.Account!.Id != accountId)
-            throw new AccessDenied("Permission denied");
+        var hasAnimals = await _database.Animals.AnyAsync(x => x.ChipperId == accountId);
+        if (hasAnimals)
+            throw new InvalidOperationException("Account has animal");
 
-        _context.Accounts.Remove(account);
-        await _context.SaveChangesAsync();
+        _database.Accounts.Remove(account);
+        await _database.SaveChangesAsync();
     }
 
     public async Task<bool> CheckExists(string email, string password)
     {
-        return await _context.Accounts.AnyAsync(x => x.Email == email && x.Password == password);
+        return await _database.Accounts.AnyAsync(x => x.Email == email && x.Password == password);
+    }
+
+    private async Task<Account> FindAccount(int accountId)
+    {
+        if (_currentAccount.Account?.Id == default || _currentAccount.Account!.Id != accountId)
+            throw new ForbiddenException("Permission denied");
+
+        var account = await _database.Accounts.FindAsync(accountId);
+        return account!;
     }
 }

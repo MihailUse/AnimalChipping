@@ -9,7 +9,7 @@ services:
     volumes:
       - /var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=AnimalChipping  
+      - POSTGRES_DB=AnimalChipping
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
   

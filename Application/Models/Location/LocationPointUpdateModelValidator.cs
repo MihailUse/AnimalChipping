@@ -6,12 +6,6 @@ public class LocationPointUpdateModelValidator : AbstractValidator<LocationPoint
 {
     public LocationPointUpdateModelValidator()
     {
-        RuleFor(x => x.Latitude)
-            .LessThan(90)
-            .GreaterThan(-90);
-
-        RuleFor(x => x.Longitude)
-            .LessThan(180)
-            .GreaterThan(-180);
+        Include(new LocationPointCreateModelValidator());
     }
 }
