@@ -7,6 +7,6 @@ public class AnimalVisitedLocation
     public long LocationPointId { get; set; }
     public DateTime DateTimeOfVisitLocationPoint { get; set; } = DateTime.UtcNow;
 
-    public virtual Animal Animal { get; set; } = null!;
-    public virtual LocationPoint LocationPoint { get; set; } = null!;
+    public Animal Animal { get; set; } = null!;
+    public LocationPoint LocationPoint { get; set; } = null!;
 }

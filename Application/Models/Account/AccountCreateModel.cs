@@ -1,9 +1,6 @@
 namespace Application.Models.Account;
 
-public class AccountCreateModel
+public class AccountCreateModel : AccountRegistrationModel
 {
-    public string FirstName { get; set; } = null!;
-    public string LastName { get; set; } = null!;
-    public string Email { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public string Role { get; set; } = null!;
 }

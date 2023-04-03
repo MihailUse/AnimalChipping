@@ -1,3 +1,4 @@
+using Domain.Entities;
 using FluentValidation;
 
 namespace Application.Models.Account;
@@ -6,9 +7,8 @@ public class AccountCreateModelValidator : AbstractValidator<AccountCreateModel>
 {
     public AccountCreateModelValidator()
     {
-        RuleFor(x => x.FirstName).NotEmpty();
-        RuleFor(x => x.LastName).NotEmpty();
-        RuleFor(x => x.Password).NotEmpty();
-        RuleFor(x => x.Email).EmailAddress();
+        Include(new AccountRegistrationModelValidator());
+        RuleFor(x => x.Role)
+            .Must(x => x == default || Enum.IsDefined(typeof(AccountRole), x));
     }
 }

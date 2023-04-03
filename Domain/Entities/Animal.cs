@@ -1,5 +1,3 @@
-// ReSharper disable InconsistentNaming
-
 namespace Domain.Entities;
 
 public class Animal
@@ -16,21 +14,8 @@ public class Animal
     public int ChipperId { get; set; }
     public long ChippingLocationId { get; set; }
 
-    public virtual Account Chipper { get; set; } = null!;
-    public virtual LocationPoint ChippingLocation { get; set; } = null!;
-    public virtual List<AnimalType> AnimalTypes { get; set; } = null!;
-    public virtual List<AnimalVisitedLocation> VisitedLocations { get; set; } = null!;
-
-    public enum AnimalGender
-    {
-        MALE,
-        FEMALE,
-        OTHER,
-    }
-
-    public enum AnimalLifeStatus
-    {
-        ALIVE,
-        DEAD,
-    }
+    public Account Chipper { get; set; } = null!;
+    public LocationPoint ChippingLocation { get; set; } = null!;
+    public List<AnimalType> AnimalTypes { get; set; } = null!;
+    public List<AnimalVisitedLocation> VisitedLocations { get; set; } = null!;
 }

@@ -27,14 +27,8 @@ internal class AccountService : IAccountService
 
     public async Task<AccountModel> Get(int accountId)
     {
-        var account = await _database.Accounts
-            .ProjectTo<AccountModel>(_mapper.ConfigurationProvider)
-            .FirstOrDefaultAsync(x => x.Id == accountId);
-
-        if (account == default)
-            throw new NotFoundException("Account not found");
-
-        return account;
+        var account = await FindAccount(accountId);
+        return _mapper.Map<AccountModel>(account);
     }
 
     public async Task<List<AccountModel>> Search(AccountSearchModel searchModel)
@@ -59,6 +53,20 @@ internal class AccountService : IAccountService
     }
 
     public async Task<AccountModel> Create(AccountCreateModel accountCreateModel)
+    {
+        var account = _mapper.Map<Account>(accountCreateModel);
+
+        var emailExists = await _database.Accounts.AnyAsync(x => x.Email == account.Email);
+        if (emailExists)
+            throw new ConflictException("Email already exists");
+
+        await _database.Accounts.AddAsync(account);
+        await _database.SaveChangesAsync();
+
+        return _mapper.Map<AccountModel>(account);
+    }
+    
+    public async Task<AccountModel> Registrate(AccountRegistrationModel accountCreateModel)
     {
         var account = _mapper.Map<Account>(accountCreateModel);
 
@@ -111,10 +119,15 @@ internal class AccountService : IAccountService
 
     private async Task<Account> FindAccount(int accountId)
     {
-        if (_currentAccount.Account?.Id == default || _currentAccount.Account!.Id != accountId)
+        var account = await _database.Accounts.FindAsync(accountId);
+
+        if ((accountId != _currentAccount.Account!.Id || account == default) &&
+            _currentAccount.Account.Role.HasFlag(AccountRole.USER | AccountRole.CHIPPER))
             throw new ForbiddenException("Permission denied");
 
-        var account = await _database.Accounts.FindAsync(accountId);
-        return account!;
+        if (account == default)
+            throw new NotFoundException("Account not found");
+
+        return account;
     }
 }

@@ -35,10 +35,11 @@ public class ErrorHandlerMiddleware
             if (result.StatusCode == StatusCodes.Status500InternalServerError)
                 _logger.Log(
                     LogLevel.Error,
-                    "Request {Method} {Url} Error: {Error}",
+                    "Request {Method} {Url} Error: {Error} \n StackTrace: {StackTrace}",
                     httpContext.Request.Method,
                     httpContext.Request.Path.Value,
-                    e.Message
+                    e.Message,
+                    e.StackTrace
                 );
 
             await result.ExecuteResultAsync(new ActionContext

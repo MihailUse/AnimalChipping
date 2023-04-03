@@ -14,8 +14,11 @@ public class ValidateIdentifierAttribute : ActionFilterAttribute
 
         foreach (var (key, value) in identifierArguments)
         {
-            if (value == null || Convert.ToInt64(value) <= 0)
-                filterContext.Result = new BadRequestResult();
+            if (value != null && Convert.ToInt64(value) > 0)
+                continue;
+
+            filterContext.Result = new BadRequestResult();
+            return;
         }
     }
 }

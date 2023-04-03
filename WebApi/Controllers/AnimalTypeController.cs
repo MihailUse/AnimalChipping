@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using Application.Models.AnimalType;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Attributes;
@@ -19,7 +20,6 @@ public class AnimalTypeController : ControllerBase
         _animalTypeService = animalTypeService;
     }
 
-    [AllowAnonymous]
     [HttpGet("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalTypeModel))]
     public async Task<IActionResult> Get([FromRoute] long typeId)
@@ -27,6 +27,7 @@ public class AnimalTypeController : ControllerBase
         return Ok(await _animalTypeService.Get(typeId));
     }
 
+    [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalTypeModel))]
     public async Task<IActionResult> Create([FromBody] AnimalTypeCreateModel model)
@@ -34,6 +35,7 @@ public class AnimalTypeController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, await _animalTypeService.Create(model));
     }
 
+    [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPut("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalTypeModel))]
     public async Task<IActionResult> Update([FromRoute] long typeId, [FromBody] AnimalTypeUpdateModel updateModel)
@@ -41,6 +43,7 @@ public class AnimalTypeController : ControllerBase
         return Ok(await _animalTypeService.Update(typeId, updateModel));
     }
 
+    [CheckRole(AccountRole.ADMIN)]
     [HttpDelete("{typeId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task Delete([FromRoute] long typeId)

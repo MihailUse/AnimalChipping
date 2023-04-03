@@ -1,11 +1,13 @@
-    using Application.Interfaces;
+using Application.Interfaces;
 using Application.Models.Account;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Attributes;
 
 namespace WebApi.Controllers;
 
+[Authorize]
 [ValidateIdentifier]
 [ApiController]
 [Route("accounts")]
@@ -25,6 +27,7 @@ public class AccountController : ControllerBase
         return Ok(await _accountService.Get(accountId));
     }
 
+    [CheckRole(AccountRole.ADMIN)]
     [HttpGet("search")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AccountModel>))]
     public async Task<IActionResult> Search([FromQuery] AccountSearchModel searchModel)
@@ -32,7 +35,14 @@ public class AccountController : ControllerBase
         return Ok(await _accountService.Search(searchModel));
     }
 
-    [Authorize]
+    [CheckRole(AccountRole.ADMIN)]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] AccountCreateModel accountCreateModel)
+    {
+        return StatusCode(StatusCodes.Status201Created, await _accountService.Create(accountCreateModel));
+    }
+
     [HttpPut("{accountId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AccountModel))]
     public async Task<IActionResult> Update([FromRoute] int accountId, [FromBody] AccountUpdateModel updateModel)
@@ -40,7 +50,6 @@ public class AccountController : ControllerBase
         return Ok(await _accountService.Update(accountId, updateModel));
     }
 
-    [Authorize]
     [HttpDelete("{accountId:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task Delete([FromRoute] int accountId)

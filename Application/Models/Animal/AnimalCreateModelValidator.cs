@@ -19,6 +19,6 @@ public class AnimalCreateModelValidator : AbstractValidator<AnimalCreateModel>
         RuleFor(x => x.AnimalTypes)
             .Must(x => x.Any(typeId => typeId > 0));
         RuleFor(x => x.Gender)
-            .Must(x => x != null && Enum.IsDefined(typeof(Domain.Entities.Animal.AnimalGender), x));
+            .Must(x => x != null && Enum.IsDefined(typeof(Domain.Entities.AnimalGender), x));
     }
 }

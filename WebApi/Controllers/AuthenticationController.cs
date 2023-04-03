@@ -19,8 +19,8 @@ public class AuthenticationController : ControllerBase
     [Unauthorized]
     [HttpPost("registration")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public async Task<IActionResult> Registration([FromBody] AccountCreateModel accountCreateModel)
+    public async Task<IActionResult> Registration([FromBody] AccountRegistrationModel accountCreateModel)
     {
-        return StatusCode(StatusCodes.Status201Created, await _accountService.Create(accountCreateModel));
+        return StatusCode(StatusCodes.Status201Created, await _accountService.Registrate(accountCreateModel));
     }
 }

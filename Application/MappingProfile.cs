@@ -31,10 +31,10 @@ public class MappingProfile : Profile
         // animal
         CreateMap<AnimalCreateModel, Animal>()
             .ForMember(d => d.AnimalTypes, m => m.Ignore())
-            .ForMember(d => d.Gender, m => m.MapFrom(s => Enum.Parse<Animal.AnimalGender>(s.Gender)));
+            .ForMember(d => d.Gender, m => m.MapFrom(s => Enum.Parse<AnimalGender>(s.Gender)));
         CreateMap<AnimalUpdateModel, Animal>()
-            .ForMember(d => d.Gender, m => m.MapFrom(s => Enum.Parse<Animal.AnimalGender>(s.Gender)))
-            .ForMember(d => d.LifeStatus, m => m.MapFrom(s => Enum.Parse<Animal.AnimalLifeStatus>(s.LifeStatus)));
+            .ForMember(d => d.Gender, m => m.MapFrom(s => Enum.Parse<AnimalGender>(s.Gender)))
+            .ForMember(d => d.LifeStatus, m => m.MapFrom(s => Enum.Parse<AnimalLifeStatus>(s.LifeStatus)));
         CreateMap<Animal, AnimalModel>()
             .ForMember(d => d.Gender, m => m.MapFrom(s => s.Gender.ToString()))
             .ForMember(d => d.LifeStatus, m => m.MapFrom(s => s.LifeStatus.ToString()))
@@ -47,7 +47,9 @@ public class MappingProfile : Profile
         CreateMap<AnimalTypeModel, AnimalType>().ReverseMap();
 
         // account
-        CreateMap<AccountCreateModel, Account>();
+        CreateMap<AccountRegistrationModel, Account>();
+        CreateMap<AccountCreateModel, Account>()
+            .ForMember(d => d.Role, m => m.MapFrom(s => Enum.Parse<AccountRole>(s.Role)));
         CreateMap<AccountUpdateModel, Account>();
         CreateMap<Account, AccountModel>().ReverseMap();
 

@@ -6,6 +6,6 @@ public class LocationPoint
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 
-    public virtual List<Animal> ChippedAnimals { get; set; } = null!;
-    public virtual List<AnimalVisitedLocation> AnimalVisitedLocations { get; set; } = null!;
+    public List<Animal> ChippedAnimals { get; set; } = null!;
+    public List<AnimalVisitedLocation> AnimalVisitedLocations { get; set; } = null!;
 }
