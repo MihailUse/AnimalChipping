@@ -1,6 +1,6 @@
 // ReSharper disable InconsistentNaming
 
-namespace Domain.Entities;
+namespace Application.Entities;
 
 public enum AnimalLifeStatus
 {

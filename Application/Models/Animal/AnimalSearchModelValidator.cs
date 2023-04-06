@@ -1,7 +1,7 @@
 using Application.Models.Common;
 using FluentValidation;
-using AnimalGender = Domain.Entities.AnimalGender;
-using AnimalLifeStatus = Domain.Entities.AnimalLifeStatus;
+using AnimalGender = Application.Entities.AnimalGender;
+using AnimalLifeStatus = Application.Entities.AnimalLifeStatus;
 
 namespace Application.Models.Animal;
 

@@ -3,7 +3,7 @@ version: '3.9'
 services:
   # Сервис для разворачивания контейнера с базой данных
   database:
-    image: postgres:latest
+    image: postgis/postgis:latest # postgis is postgres with installed extension PostGIS
     ports:
       - "5432"
     volumes:
@@ -12,6 +12,11 @@ services:
       - POSTGRES_DB=AnimalChipping
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U user -d AnimalChipping'" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
   
   
   # Сервис для разворачивания контейнера с приложением
@@ -20,7 +25,8 @@ services:
     ports:
       - "80"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       - ASPNETCORE_URLS=http://+:443;http://+:80
       - ConnectionStrings__DefaultConnection=Server=database;Port=5432;Database=AnimalChipping;User Id=user;Password=password
@@ -36,6 +42,6 @@ services:
       - webapi
     environment:
       SERVER_URL: http://webapi:80
-      STAGE: 0
+      STAGE: 1
       # all - запуск всех тестов из трёх доступных этапов
       # 0, 1, 2 или 3 - запуск тестов для соответствующего этапа

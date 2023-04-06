@@ -19,6 +19,7 @@ public static class ConfigureServices
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<IAnimalService, AnimalService>();
         services.AddScoped<IAnimalTypeService, AnimalTypeService>();
+        services.AddScoped<IAreaService, AreaService>();
 
         return services;
     }

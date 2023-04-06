@@ -1,10 +1,10 @@
+using Application.Entities;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Animal;
 using Application.Models.AnimalVisitedLocation;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;

@@ -1,9 +1,8 @@
-using Application.Models.Animal;
 using FluentValidation;
-using AnimalGender = Domain.Entities.AnimalGender;
-using AnimalLifeStatus = Domain.Entities.AnimalLifeStatus;
+using AnimalGender = Application.Entities.AnimalGender;
+using AnimalLifeStatus = Application.Entities.AnimalLifeStatus;
 
-namespace Application.Models.Account;
+namespace Application.Models.Animal;
 
 public class AnimalUpdateModelValidator : AbstractValidator<AnimalUpdateModel>
 {

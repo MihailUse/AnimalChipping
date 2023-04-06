@@ -1,9 +1,9 @@
+using Application.Entities;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Location;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;

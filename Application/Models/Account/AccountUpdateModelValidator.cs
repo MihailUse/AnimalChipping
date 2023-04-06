@@ -1,4 +1,3 @@
-using Domain.Entities;
 using FluentValidation;
 
 namespace Application.Models.Account;

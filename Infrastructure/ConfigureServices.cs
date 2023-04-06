@@ -15,7 +15,11 @@ public static class ConfigureServices
     {
         services.AddDbContext<IDatabaseContext, DatabaseContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
-                builder => builder.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
+                o =>
+                {
+                    o.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName);
+                    o.UseNetTopologySuite();
+                }));
 
         return services;
     }

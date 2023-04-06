@@ -1,7 +1,7 @@
+using Application.Entities;
 using Application.Interfaces;
 using Application.Models.Animal;
 using Application.Models.AnimalVisitedLocation;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Attributes;

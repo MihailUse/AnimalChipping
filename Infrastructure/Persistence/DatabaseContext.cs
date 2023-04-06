@@ -1,5 +1,5 @@
+using Application.Entities;
 using Application.Interfaces;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
@@ -11,6 +11,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
     public DbSet<AnimalType> AnimalTypes => Set<AnimalType>();
     public DbSet<LocationPoint> LocationPoints => Set<LocationPoint>();
     public DbSet<AnimalVisitedLocation> AnimalVisitedLocations => Set<AnimalVisitedLocation>();
+    public DbSet<Area> Areas => Set<Area>();
 
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {
@@ -18,6 +19,11 @@ public class DatabaseContext : DbContext, IDatabaseContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasPostgresEnum<AnimalGender>();
+        modelBuilder.HasPostgresEnum<AnimalLifeStatus>();
+        modelBuilder.HasPostgresEnum<AccountRole>();
+        modelBuilder.HasPostgresExtension("postgis");
+        
         modelBuilder.Entity<Account>()
             .HasIndex(x => x.Email)
             .IsUnique();

@@ -1,4 +1,4 @@
-using Domain.Entities;
+using Application.Entities;
 
 namespace Application.Interfaces;
 

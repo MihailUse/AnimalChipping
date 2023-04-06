@@ -10,14 +10,12 @@ WORKDIR /src
 COPY ["*.sln", "./"]
 COPY ["Infrastructure/*.csproj", "Infrastructure/"]
 COPY ["Application/*.csproj", "Application/"]
-COPY ["Domain/*.csproj", "Domain/"]
 COPY ["WebApi/*.csproj", "WebApi/"]
 RUN dotnet restore
 
 # copy everything else and build app
 COPY ["Infrastructure/*", "Infrastructure/"]
 COPY ["Application/*", "Application/"]
-COPY ["Domain/*", "Domain/"]
 COPY ["WebApi/*", "WebApi/"]
 
 WORKDIR "/src/WebApi"
