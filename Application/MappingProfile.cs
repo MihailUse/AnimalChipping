@@ -56,10 +56,16 @@ public class MappingProfile : Profile
         CreateMap<Account, AccountModel>().ReverseMap();
 
         // location
-        CreateMap<LocationPointCreateModel, LocationPoint>();
-        CreateMap<LocationPointUpdateModel, LocationPoint>();
-        CreateMap<LocationPoint, LocationPointModel>().ReverseMap();
-
+        CreateMap<LocationPointCreateModel, LocationPoint>()
+            .ForMember(d => d.Point, m => m.MapFrom(s => new Point(s.Longitude, s.Latitude)));
+        CreateMap<LocationPointUpdateModel, LocationPoint>()
+            .ForMember(d => d.Point, m => m.MapFrom(s => new Point(s.Longitude, s.Latitude)));
+        CreateMap<LocationPoint, LocationPointModel>()
+            .ForMember(d => d.Longitude, m => m.MapFrom(s => s.Point.X))
+            .ForMember(d => d.Latitude, m => m.MapFrom(s => s.Point.Y));
+        CreateMap<LocationPointModel, LocationPoint>()
+            .ForMember(d => d.Point, m => m.MapFrom(s => new Point(s.Longitude, s.Latitude)));
+        
         // AnimalVisitedLocation 
         CreateMap<AnimalVisitedLocation, AnimalVisitedLocationModel>();
 

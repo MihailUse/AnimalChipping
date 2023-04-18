@@ -8,4 +8,5 @@ public interface IAreaService
     Task<AreaModel> Create(AreaCreateModel createModel);
     Task<AreaModel> Update(long areaId, AreaUpdateModel updateModel);
     Task Delete(long areaId);
+    Task<AnalyticModel> GetAnalytic(long areaId, GetAnalyticModel model);
 }

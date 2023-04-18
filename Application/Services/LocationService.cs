@@ -34,7 +34,7 @@ internal class LocationService : ILocationService
     public async Task<LocationPointModel> Create(LocationPointCreateModel createModel)
     {
         var isExists = await _database.LocationPoints
-            .AnyAsync(x => x.Longitude == createModel.Longitude && x.Latitude == createModel.Latitude);
+            .AnyAsync(x => x.Point.X == createModel.Longitude && x.Point.Y == createModel.Latitude);
         if (isExists)
             throw new ConflictException("Location already exists");
 
@@ -53,8 +53,8 @@ internal class LocationService : ILocationService
 
         var isExists = await _database.LocationPoints.AnyAsync(x =>
             x.Id != pointId &&
-            x.Latitude == updateModel.Latitude &&
-            x.Longitude == updateModel.Longitude);
+            x.Point.X == updateModel.Longitude &&
+            x.Point.Y == updateModel.Latitude);
         if (isExists)
             throw new ConflictException("Location already exists");
 

@@ -27,6 +27,13 @@ public class AreaController : ControllerBase
         return Ok(await _areaService.Get(areaId));
     }
 
+    [HttpGet("{areaId:long}/analytics")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnalyticModel))]
+    public async Task<IActionResult> GetAnalytic([FromRoute] long areaId, [FromQuery] GetAnalyticModel model)
+    {
+        return Ok(await _areaService.GetAnalytic(areaId, model));
+    }
+
     [CheckRole(AccountRole.ADMIN)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AreaModel))]

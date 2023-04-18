@@ -115,7 +115,7 @@ internal class AnimalService : IAnimalService
         animal = _mapper.Map(updateModel, animal);
 
         if (animal.LifeStatus == AnimalLifeStatus.DEAD && !animal.DeathDateTime.HasValue)
-            animal.DeathDateTime = DateTime.UtcNow;
+            animal.DeathDateTime = DateTimeOffset.UtcNow;
 
         _database.Animals.Update(animal);
         await _database.SaveChangesAsync();

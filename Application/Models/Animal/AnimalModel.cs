@@ -8,8 +8,8 @@ public class AnimalModel
     public float Height { get; set; }
     public string Gender { get; set; } = null!;
     public string LifeStatus { get; set; } = null!;
-    public DateTime ChippingDateTime { get; set; }
-    public DateTime? DeathDateTime { get; set; }
+    public DateTimeOffset ChippingDateTime { get; set; }
+    public DateTimeOffset? DeathDateTime { get; set; }
 
     public int ChipperId { get; set; }
     public long ChippingLocationId { get; set; }
