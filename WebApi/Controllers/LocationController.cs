@@ -1,5 +1,6 @@
 using Application.Entities;
 using Application.Interfaces;
+using Application.Models.Area;
 using Application.Models.Location;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,14 @@ public class LocationController : ControllerBase
     {
         _locationService = locationService;
     }
-    
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    public async Task<IActionResult> GetIdByPoint([FromQuery] PointModel model)
+    {
+        return Ok(await _locationService.GetIdByPoint(model));
+    }
+
     [HttpGet("{locationId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationPointModel))]
     public async Task<IActionResult> Get([FromRoute] int locationId)
@@ -49,5 +57,26 @@ public class LocationController : ControllerBase
     public async Task Delete([FromRoute] long pointId)
     {
         await _locationService.Delete(pointId);
+    }
+
+    [HttpGet("geohash")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    public async Task<IActionResult> GetPlusCodeHash([FromQuery] PointModel model)
+    {
+        return Ok(await _locationService.GetPlusCodeHash(model));
+    }
+
+    [HttpGet("geohashv2")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    public async Task<IActionResult> GetPlusCodeBase64([FromQuery] PointModel model)
+    {
+        return Ok(await _locationService.GetPlusCodeBase64(model));
+    }
+
+    [HttpGet("geohashv3")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
+    public async Task<IActionResult> GetHashV3([FromQuery] PointModel model)
+    {
+        return Ok(await _locationService.GetHashV3(model));
     }
 }

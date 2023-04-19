@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Persistence;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,8 @@ public static class ConfigureServices
                     o.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName);
                     o.UseNetTopologySuite();
                 }));
+
+        services.AddSingleton<IGeoHashService, GeoHashService>();
 
         return services;
     }
