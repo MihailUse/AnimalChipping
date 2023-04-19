@@ -3,7 +3,7 @@ using NetTopologySuite.Geometries;
 
 #nullable disable
 
-namespace Infrastructure.Persistence.Migrations
+namespace Domain.Persistence.Migrations
 {
     public partial class FixLocationType : Migration
     {

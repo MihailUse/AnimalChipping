@@ -1,5 +1,3 @@
-using Application.Models.Location;
-
 namespace Application.Models.Area;
 
 public class AreaCreateModel

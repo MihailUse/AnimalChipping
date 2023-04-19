@@ -1,6 +1,6 @@
 // ReSharper disable InconsistentNaming
 
-namespace Application.Entities;
+namespace Domain.Entities;
 
 [Flags]
 public enum AccountRole

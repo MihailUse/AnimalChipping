@@ -1,4 +1,4 @@
-using Application.Entities;
+using Domain.Entities;
 using FluentValidation;
 
 namespace Application.Models.Animal;

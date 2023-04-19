@@ -1,8 +1,9 @@
-using Application.Entities;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.AnimalType;
 using AutoMapper;
+using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;

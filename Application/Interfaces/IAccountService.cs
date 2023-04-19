@@ -1,5 +1,5 @@
-using Application.Entities;
 using Application.Models.Account;
+using Domain.Entities;
 
 namespace Application.Interfaces;
 

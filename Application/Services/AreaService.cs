@@ -1,13 +1,11 @@
-using System.Linq.Expressions;
-using Application.Entities;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Area;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Area = Application.Entities.Area;
+using Area = Domain.Entities.Area;
 
 namespace Application.Services;
 

@@ -1,8 +1,9 @@
 using Application;
 using Application.Interfaces;
+using Domain;
+using Domain.Persistence;
 using FluentValidation.AspNetCore;
 using Infrastructure;
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -20,7 +21,8 @@ public abstract class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.AddDomainServices(builder.Configuration);
+        builder.Services.AddInfrastructureServices();
         builder.Services.AddApplicationServices();
         builder.Services.AddScoped<ICurrentAccount, CurrentAccountService>();
 

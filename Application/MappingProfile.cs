@@ -1,4 +1,3 @@
-using Application.Entities;
 using Application.Models.Account;
 using Application.Models.Animal;
 using Application.Models.AnimalType;
@@ -6,6 +5,7 @@ using Application.Models.AnimalVisitedLocation;
 using Application.Models.Area;
 using Application.Models.Location;
 using AutoMapper;
+using Domain.Entities;
 using NetTopologySuite.Geometries;
 
 namespace Application;
@@ -71,7 +71,7 @@ public class MappingProfile : Profile
 
         // Area
         CreateMap<List<PointModel>, LineString>()
-            .ConvertUsing((source, destination, context) =>
+            .ConvertUsing((source, _, _) =>
             {
                 return new LineString(source
                     .Select(p => new Coordinate(p.Longitude, p.Latitude))
@@ -80,7 +80,7 @@ public class MappingProfile : Profile
             });
 
         CreateMap<LineString, List<PointModel>>()
-            .ConvertUsing((source, destination, context) =>
+            .ConvertUsing((source, _, _) =>
             {
                 return source.Coordinates
                     .Select(x => new PointModel(x.X, x.Y))

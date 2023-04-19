@@ -1,5 +1,5 @@
-using Application.Entities;
 using Application.Interfaces;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

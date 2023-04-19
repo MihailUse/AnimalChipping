@@ -8,14 +8,16 @@ WORKDIR /src
 
 # copy csproj and restore as distinct layers
 COPY ["*.sln", "./"]
-COPY ["Infrastructure/*.csproj", "Infrastructure/"]
+COPY ["Domain/*.csproj", "Domain/"]
 COPY ["Application/*.csproj", "Application/"]
+COPY ["Infrastructure/*.csproj", "Infrastructure/"]
 COPY ["WebApi/*.csproj", "WebApi/"]
 RUN dotnet restore
 
 # copy everything else and build app
-COPY ["Infrastructure/*", "Infrastructure/"]
+COPY ["Domain/*", "Domain/"]
 COPY ["Application/*", "Application/"]
+COPY ["Infrastructure/*", "Infrastructure/"]
 COPY ["WebApi/*", "WebApi/"]
 
 WORKDIR "/src/WebApi"

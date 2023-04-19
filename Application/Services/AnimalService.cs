@@ -1,10 +1,11 @@
-using Application.Entities;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Animal;
 using Application.Models.AnimalVisitedLocation;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
@@ -214,7 +215,7 @@ internal class AnimalService : IAnimalService
         // hmmm, add seconds to time it`s not good...
         // because auto generated tests for "isEqualTo" are expecting part of data with DateTimeOfVisitLocationPoint + 1 sec 
         if (searchLocationModel.EndDateTime != default)
-            query = query.Where(x => x.DateTimeOfVisitLocationPoint <= searchLocationModel.EndDateTime.Value.AddSeconds(1));
+            query = query.Where(x => x.DateTimeOfVisitLocationPoint <= searchLocationModel.EndDateTime!.Value.AddSeconds(1));
 
         return await query
             .OrderBy(x => x.DateTimeOfVisitLocationPoint)

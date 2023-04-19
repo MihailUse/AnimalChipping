@@ -1,6 +1,6 @@
 using NetTopologySuite.Geometries;
 
-namespace Application.Entities;
+namespace Domain.Entities;
 
 public class Area
 {

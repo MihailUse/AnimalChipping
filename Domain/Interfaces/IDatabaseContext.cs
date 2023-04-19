@@ -1,7 +1,7 @@
-using Application.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Interfaces;
+namespace Domain.Interfaces;
 
 public interface IDatabaseContext
 {
@@ -12,5 +12,5 @@ public interface IDatabaseContext
     public DbSet<AnimalVisitedLocation> AnimalVisitedLocations { get; }
     public DbSet<Area> Areas { get; }
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken());
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = new());
 }

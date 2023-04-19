@@ -1,8 +1,8 @@
-using Application.Entities;
-using Application.Interfaces;
+using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Persistence;
+namespace Domain.Persistence;
 
 public class DatabaseContext : DbContext, IDatabaseContext
 {

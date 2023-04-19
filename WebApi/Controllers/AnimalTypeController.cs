@@ -1,6 +1,6 @@
-using Application.Entities;
 using Application.Interfaces;
 using Application.Models.AnimalType;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Attributes;

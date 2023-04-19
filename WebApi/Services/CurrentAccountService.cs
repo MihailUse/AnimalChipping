@@ -1,5 +1,5 @@
-using Application.Entities;
 using Application.Interfaces;
+using Domain.Entities;
 
 namespace WebApi.Services;
 

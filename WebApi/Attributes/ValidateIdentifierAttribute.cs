@@ -12,7 +12,7 @@ public class ValidateIdentifierAttribute : ActionFilterAttribute
                 x.Key.Contains("Id", StringComparison.CurrentCultureIgnoreCase) &&
                 x.Value is long or int);
 
-        foreach (var (key, value) in identifierArguments)
+        foreach (var (_, value) in identifierArguments)
         {
             if (value != null && Convert.ToInt64(value) > 0)
                 continue;

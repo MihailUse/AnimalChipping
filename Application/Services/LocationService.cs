@@ -1,12 +1,13 @@
 using System.Security.Cryptography;
 using System.Text;
-using Application.Entities;
 using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Area;
 using Application.Models.Location;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
