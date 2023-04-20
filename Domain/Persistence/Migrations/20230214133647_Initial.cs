@@ -64,8 +64,8 @@ namespace Infrastructure.Persistence.Migrations
                     Height = table.Column<float>(type: "real", nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     LifeStatus = table.Column<int>(type: "integer", nullable: false),
-                    ChippingDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeathDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ChippingDateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    DeathDateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     ChipperId = table.Column<int>(type: "integer", nullable: false),
                     ChippingLocationId = table.Column<long>(type: "bigint", nullable: false)
                 },
@@ -116,7 +116,7 @@ namespace Infrastructure.Persistence.Migrations
                 {
                     AnimalId = table.Column<long>(type: "bigint", nullable: false),
                     LocationPointId = table.Column<long>(type: "bigint", nullable: false),
-                    DateTimeOfVisitLocationPoint = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DateTimeOfVisitLocationPoint = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

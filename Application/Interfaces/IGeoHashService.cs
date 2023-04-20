@@ -2,5 +2,5 @@ namespace Application.Interfaces;
 
 public interface IGeoHashService
 {
-    public string GetPlusCodeHash(double latitude, double longitude);
+    public string GetOpenLocationCode(double latitude, double longitude);
 }

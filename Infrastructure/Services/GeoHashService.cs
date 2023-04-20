@@ -5,7 +5,7 @@ namespace Infrastructure.Services;
 
 public class GeoHashService : IGeoHashService
 {
-    public string GetPlusCodeHash(double latitude, double longitude)
+    public string GetOpenLocationCode(double latitude, double longitude)
     {
         var encoder = new GeoHashEncoder<string>();
         return encoder.Encode(latitude, longitude);

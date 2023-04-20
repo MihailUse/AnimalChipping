@@ -61,22 +61,22 @@ public class LocationController : ControllerBase
 
     [HttpGet("geohash")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetPlusCodeHash([FromQuery] PointModel model)
+    public async Task<IActionResult> GetOpenLocationCode([FromQuery] PointModel model)
     {
-        return Ok(await _locationService.GetPlusCodeHash(model));
+        return Ok(await _locationService.GetOpenLocationCode(model));
     }
 
     [HttpGet("geohashv2")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetPlusCodeBase64([FromQuery] PointModel model)
+    public async Task<IActionResult> GetOpenLocationCodeBase64([FromQuery] PointModel model)
     {
-        return Ok(await _locationService.GetPlusCodeBase64(model));
+        return Ok(await _locationService.GetOpenLocationCodeBase64(model));
     }
 
     [HttpGet("geohashv3")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetHashV3([FromQuery] PointModel model)
+    public async Task<IActionResult> GetOpenLocationCodeHash([FromQuery] PointModel model)
     {
-        return Ok(await _locationService.GetHashV3(model));
+        return Ok(await _locationService.GetOpenLocationCodeHash(model));
     }
 }

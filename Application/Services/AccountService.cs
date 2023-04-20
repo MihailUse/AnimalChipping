@@ -66,7 +66,7 @@ internal class AccountService : IAccountService
 
         return _mapper.Map<AccountModel>(account);
     }
-    
+
     public async Task<AccountModel> Registrate(AccountRegistrationModel accountCreateModel)
     {
         var account = _mapper.Map<Account>(accountCreateModel);

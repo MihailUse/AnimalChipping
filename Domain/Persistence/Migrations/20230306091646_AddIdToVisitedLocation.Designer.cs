@@ -83,13 +83,13 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<int>("ChipperId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("ChippingDateTime")
+                    b.Property<DateTimeOffset>("ChippingDateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("ChippingLocationId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("DeathDateTime")
+                    b.Property<DateTimeOffset?>("DeathDateTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Gender")
@@ -144,7 +144,7 @@ namespace Infrastructure.Persistence.Migrations
                     b.Property<long>("AnimalId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("DateTimeOfVisitLocationPoint")
+                    b.Property<DateTimeOffset>("DateTimeOfVisitLocationPoint")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<long>("LocationPointId")

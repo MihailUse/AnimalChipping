@@ -40,8 +40,10 @@ internal class LocationService : ILocationService
 
     public async Task<LocationPointModel> Create(LocationPointCreateModel createModel)
     {
-        var isExists = await _database.LocationPoints
-            .AnyAsync(x => x.Point.X == createModel.Longitude && x.Point.Y == createModel.Latitude);
+        var isExists = await _database.LocationPoints.AnyAsync(x =>
+            x.Point.X == createModel.Longitude &&
+            x.Point.Y == createModel.Latitude
+        );
         if (isExists)
             throw new ConflictException("Location already exists");
 
@@ -95,23 +97,23 @@ internal class LocationService : ILocationService
     }
 
 
-    public async Task<string> GetPlusCodeHash(PointModel model)
+    public async Task<string> GetOpenLocationCode(PointModel model)
     {
         var location = await FindLocation(model);
-        return _hashService.GetPlusCodeHash(location.Point.Y, location.Point.X);
+        return _hashService.GetOpenLocationCode(location.Point.Y, location.Point.X);
     }
 
-    public async Task<string> GetPlusCodeBase64(PointModel model)
+    public async Task<string> GetOpenLocationCodeBase64(PointModel model)
     {
         var location = await FindLocation(model);
-        var plusCode = _hashService.GetPlusCodeHash(location.Point.Y, location.Point.X);
+        var plusCode = _hashService.GetOpenLocationCode(location.Point.Y, location.Point.X);
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(plusCode));
     }
 
-    public async Task<string> GetHashV3(PointModel model)
+    public async Task<string> GetOpenLocationCodeHash(PointModel model)
     {
         var location = await FindLocation(model);
-        var plusCode = _hashService.GetPlusCodeHash(location.Point.Y, location.Point.X);
+        var plusCode = _hashService.GetOpenLocationCode(location.Point.Y, location.Point.X);
 
         using var md5 = MD5.Create();
         var md5Encoded = md5.ComputeHash(Encoding.ASCII.GetBytes(plusCode));

@@ -210,7 +210,7 @@ internal class AnimalService : IAnimalService
         var query = _database.AnimalVisitedLocations.Where(x => x.AnimalId == animalId);
 
         if (searchLocationModel.StartDateTime != default)
-            query = query.Where(x => x.DateTimeOfVisitLocationPoint > searchLocationModel.StartDateTime);
+            query = query.Where(x => x.DateTimeOfVisitLocationPoint >= searchLocationModel.StartDateTime);
 
         // hmmm, add seconds to time it`s not good...
         // because auto generated tests for "isEqualTo" are expecting part of data with DateTimeOfVisitLocationPoint + 1 sec 
@@ -240,7 +240,7 @@ internal class AnimalService : IAnimalService
         if (location == default)
             throw new NotFoundException("Location not found");
 
-        if (animal.VisitedLocations.Count > 0)
+        if (animal.VisitedLocations.Any())
         {
             var lastVisitedLocation = animal.VisitedLocations.First();
             if (lastVisitedLocation.LocationPointId == pointId)
@@ -256,7 +256,7 @@ internal class AnimalService : IAnimalService
         {
             Animal = animal,
             LocationPoint = location,
-            DateTimeOfVisitLocationPoint = DateTime.UtcNow
+            DateTimeOfVisitLocationPoint = DateTimeOffset.UtcNow
         };
 
         await _database.AnimalVisitedLocations.AddAsync(animalVisitedLocation);
@@ -265,10 +265,7 @@ internal class AnimalService : IAnimalService
         return _mapper.Map<AnimalVisitedLocationModel>(animalVisitedLocation);
     }
 
-    public async Task<AnimalVisitedLocationModel> UpdateLocation(
-        long animalId,
-        AnimalUpdateLocationModel updateLocationModel
-    )
+    public async Task<AnimalVisitedLocationModel> UpdateLocation(long animalId, AnimalUpdateLocationModel updateLocationModel)
     {
         var animal = await _database.Animals
             .Include(x => x.VisitedLocations.OrderBy(l => l.DateTimeOfVisitLocationPoint))
