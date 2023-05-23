@@ -7,10 +7,11 @@ public class ValidateIdentifierAttribute : ActionFilterAttribute
 {
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {
-        var identifierArguments =
-            filterContext.ActionArguments.Where(x =>
+        var identifierArguments = filterContext.ActionArguments
+            .Where(x =>
                 x.Key.Contains("Id", StringComparison.CurrentCultureIgnoreCase) &&
-                x.Value is long or int);
+                x.Value is long or int
+            );
 
         foreach (var (_, value) in identifierArguments)
         {

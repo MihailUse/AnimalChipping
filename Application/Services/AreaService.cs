@@ -33,8 +33,8 @@ public class AreaService : IAreaService
     {
         var area = _mapper.Map<Area>(createModel);
 
-        var lineStringWithOffset =
-            new LineString(area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First()).ToArray());
+        var lineStringWithOffsetPoints = area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First());
+        var lineStringWithOffset = new LineString(lineStringWithOffsetPoints.ToArray());
         if (!area.AreaPoints.IsSimple || !area.AreaPoints.IsValid || !lineStringWithOffset.IsSimple)
             throw new InvalidOperationException("Invalid polygon points");
 
@@ -59,8 +59,8 @@ public class AreaService : IAreaService
             throw new NotFoundException("Area not found");
 
         area = _mapper.Map(updateModel, area);
-        var lineStringWithOffset =
-            new LineString(area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First()).ToArray());
+        var lineStringWithOffsetPoints = area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First());
+        var lineStringWithOffset = new LineString(lineStringWithOffsetPoints.ToArray());
         if (!area.AreaPoints.IsSimple || !area.AreaPoints.IsValid || !lineStringWithOffset.IsSimple)
             throw new InvalidOperationException("Invalid polygon points");
 

@@ -202,13 +202,9 @@ internal class AnimalService : IAnimalService
 
     #region AnimalLocation
 
-    public async Task<List<AnimalVisitedLocationModel>> SearchLocation(
-        long animalId,
-        AnimalSearchLocationModel searchLocationModel
-    )
+    public async Task<List<AnimalVisitedLocationModel>> SearchLocation(long animalId, AnimalSearchLocationModel searchLocationModel)
     {
         var query = _database.AnimalVisitedLocations.Where(x => x.AnimalId == animalId);
-
         if (searchLocationModel.StartDateTime != default)
             query = query.Where(x => x.DateTimeOfVisitLocationPoint >= searchLocationModel.StartDateTime);
 
@@ -246,10 +242,9 @@ internal class AnimalService : IAnimalService
             if (lastVisitedLocation.LocationPointId == pointId)
                 throw new InvalidOperationException("Point already exists");
         }
-        else
+        else if (animal.ChippingLocationId == pointId)
         {
-            if (animal.ChippingLocationId == pointId)
-                throw new InvalidOperationException("ChippingLocationId equals new point id");
+            throw new InvalidOperationException("ChippingLocationId equals new point id");
         }
 
         var animalVisitedLocation = new AnimalVisitedLocation()

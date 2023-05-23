@@ -65,27 +65,24 @@ public class MappingProfile : Profile
             .ForMember(d => d.Latitude, m => m.MapFrom(s => s.Point.Y));
         CreateMap<LocationPointModel, LocationPoint>()
             .ForMember(d => d.Point, m => m.MapFrom(s => new Point(s.Longitude, s.Latitude)));
-        
+
         // AnimalVisitedLocation 
         CreateMap<AnimalVisitedLocation, AnimalVisitedLocationModel>();
 
         // Area
         CreateMap<List<PointModel>, LineString>()
             .ConvertUsing((source, _, _) =>
-            {
-                return new LineString(source
-                    .Select(p => new Coordinate(p.Longitude, p.Latitude))
+                new LineString(source.Select(p =>
+                        new Coordinate(p.Longitude, p.Latitude))
                     .ToArray()
-                );
-            });
+                )
+            );
 
         CreateMap<LineString, List<PointModel>>()
-            .ConvertUsing((source, _, _) =>
-            {
-                return source.Coordinates
-                    .Select(x => new PointModel(x.X, x.Y))
-                    .ToList();
-            });
+            .ConvertUsing((source, _, _) => source.Coordinates
+                .Select(x => new PointModel(x.X, x.Y))
+                .ToList()
+            );
 
         CreateMap<AreaCreateModel, Area>();
         CreateMap<AreaUpdateModel, Area>();

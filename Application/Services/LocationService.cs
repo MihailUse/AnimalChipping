@@ -96,7 +96,6 @@ internal class LocationService : ILocationService
         return location.Id.ToString();
     }
 
-
     public async Task<string> GetOpenLocationCode(PointModel model)
     {
         var location = await FindLocation(model);
