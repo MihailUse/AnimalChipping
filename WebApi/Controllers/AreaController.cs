@@ -8,7 +8,6 @@ using WebApi.Attributes;
 namespace WebApi.Controllers;
 
 [Authorize]
-[ValidateIdentifier]
 [ApiController]
 [Route("areas")]
 public class AreaController : ControllerBase
@@ -21,31 +20,34 @@ public class AreaController : ControllerBase
     }
 
     [HttpGet("{areaId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AreaModel))]
-    public async Task<IActionResult> Get([FromRoute] long areaId)
+    public async Task<ActionResult<AreaModel>> Get([FromRoute] long areaId)
     {
         return Ok(await _areaService.Get(areaId));
     }
 
     [HttpGet("{areaId:long}/analytics")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnalyticModel))]
-    public async Task<IActionResult> GetAnalytic([FromRoute] long areaId, [FromQuery] GetAnalyticModel model)
+    public async Task<ActionResult<AnalyticModel>> GetAnalytic(
+        [FromRoute] long areaId,
+        [FromQuery] GetAnalyticModel model
+    )
     {
         return Ok(await _areaService.GetAnalytic(areaId, model));
     }
 
     [CheckRole(AccountRole.ADMIN)]
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AreaModel))]
-    public async Task<IActionResult> Create([FromBody] AreaCreateModel createModel)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult<AreaModel>> Create([FromBody] AreaCreateModel createModel)
     {
         return StatusCode(StatusCodes.Status201Created, await _areaService.Create(createModel));
     }
 
     [CheckRole(AccountRole.ADMIN)]
     [HttpPut("{areaId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AreaModel))]
-    public async Task<IActionResult> Update([FromRoute] long areaId, [FromBody] AreaUpdateModel updateModel)
+    public async Task<ActionResult<AreaModel>> Update(
+        [FromRoute] long areaId,
+        [FromBody] AreaUpdateModel updateModel
+    )
     {
         return Ok(await _areaService.Update(areaId, updateModel));
     }
@@ -53,8 +55,9 @@ public class AreaController : ControllerBase
     [CheckRole(AccountRole.ADMIN)]
     [HttpDelete("{areaId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task Delete([FromRoute] long areaId)
+    public async Task<ActionResult> Delete([FromRoute] long areaId)
     {
         await _areaService.Delete(areaId);
+        return Ok();
     }
 }

@@ -8,18 +8,18 @@ namespace Domain;
 
 public static class ConfigureServices
 {
-    public static IServiceCollection AddDomainServices(
-        this IServiceCollection services,
-        IConfiguration configuration
-    )
+    public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<IDatabaseContext, DatabaseContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
-                o =>
+            options.UseNpgsql(
+                configuration.GetConnectionString("DefaultConnection"),
+                builder =>
                 {
-                    o.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName);
-                    o.UseNetTopologySuite();
-                }));
+                    builder.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName);
+                    builder.UseNetTopologySuite();
+                }
+            )
+        );
 
         return services;
     }

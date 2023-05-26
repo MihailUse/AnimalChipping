@@ -66,7 +66,7 @@ internal class AnimalTypeService : IAnimalTypeService
 
         var hasAnimals = await _database.Animals.AnyAsync(x => x.AnimalTypes.Any(t => t.Id == typeId));
         if (hasAnimals)
-            throw new InvalidOperationException("Type contains animals");
+            throw new BadOperationException("Type contains animals");
 
         _database.AnimalTypes.Remove(type);
         await _database.SaveChangesAsync();

@@ -107,7 +107,7 @@ internal class AccountService : IAccountService
 
         var hasAnimals = await _database.Animals.AnyAsync(x => x.ChipperId == accountId);
         if (hasAnimals)
-            throw new InvalidOperationException("Account has animal");
+            throw new BadOperationException("Account has animal");
 
         _database.Accounts.Remove(account);
         await _database.SaveChangesAsync();

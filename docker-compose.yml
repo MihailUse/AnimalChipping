@@ -23,7 +23,8 @@ services:
   webapi:
     image: mihailuse/animal_chipping:latest
     ports:
-      - "80"
+      - "5001:80"
+      - "5002:443"
     depends_on:
       database:
         condition: service_healthy

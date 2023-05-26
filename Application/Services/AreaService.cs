@@ -2,10 +2,10 @@ using Application.Exceptions;
 using Application.Interfaces;
 using Application.Models.Area;
 using AutoMapper;
+using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using Area = Domain.Entities.Area;
 
 namespace Application.Services;
 
@@ -33,10 +33,10 @@ public class AreaService : IAreaService
     {
         var area = _mapper.Map<Area>(createModel);
 
-        var lineStringWithOffsetPoints = area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First());
-        var lineStringWithOffset = new LineString(lineStringWithOffsetPoints.ToArray());
+        var offsetPoints = area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First());
+        var lineStringWithOffset = new LineString(offsetPoints.ToArray());
         if (!area.AreaPoints.IsSimple || !area.AreaPoints.IsValid || !lineStringWithOffset.IsSimple)
-            throw new InvalidOperationException("Invalid polygon points");
+            throw new BadOperationException("Invalid polygon points");
 
         var hasExistsArea = await _database.Areas.AnyAsync(x => x.Name == area.Name);
         if (hasExistsArea)
@@ -44,7 +44,7 @@ public class AreaService : IAreaService
 
         var isInvalid = await _database.Areas.AnyAsync(x => x.AreaPoints.Crosses(area.AreaPoints));
         if (isInvalid)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         await _database.Areas.AddAsync(area);
         await _database.SaveChangesAsync();
@@ -59,10 +59,10 @@ public class AreaService : IAreaService
             throw new NotFoundException("Area not found");
 
         area = _mapper.Map(updateModel, area);
-        var lineStringWithOffsetPoints = area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First());
-        var lineStringWithOffset = new LineString(lineStringWithOffsetPoints.ToArray());
+        var offsetPoints = area.AreaPoints.Coordinates.Skip(1).Append(area.AreaPoints.Coordinates.First());
+        var lineStringWithOffset = new LineString(offsetPoints.ToArray());
         if (!area.AreaPoints.IsSimple || !area.AreaPoints.IsValid || !lineStringWithOffset.IsSimple)
-            throw new InvalidOperationException("Invalid polygon points");
+            throw new BadOperationException("Invalid polygon points");
 
         var hasExistsArea = await _database.Areas.AnyAsync(x => x.Id != areaId && x.Name == area.Name);
         if (hasExistsArea)
@@ -90,7 +90,9 @@ public class AreaService : IAreaService
         if (area == default)
             throw new NotFoundException("Area not found");
 
-        var areaPolygon = new Polygon(new LinearRing(area.AreaPoints.Coordinates.Append(area.AreaPoints.Coordinates.First()).ToArray()));
+        var areaPolygon =
+            new Polygon(
+                new LinearRing(area.AreaPoints.Coordinates.Append(area.AreaPoints.Coordinates.First()).ToArray()));
         var animals = await _database.Animals
             .Include(x => x.VisitedLocations
                 .Where(l =>

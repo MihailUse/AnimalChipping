@@ -9,7 +9,6 @@ using WebApi.Attributes;
 namespace WebApi.Controllers;
 
 [Authorize]
-[ValidateIdentifier]
 [ApiController]
 [Route("animals")]
 public class AnimalController : ControllerBase
@@ -22,57 +21,56 @@ public class AnimalController : ControllerBase
     }
 
     [HttpGet("{animalId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalModel))]
-    public async Task<IActionResult> Get([FromRoute] long animalId)
+    public async Task<ActionResult<AnimalModel>> Get([FromRoute] long animalId)
     {
         return Ok(await _animalService.Get(animalId));
     }
 
     [HttpGet("search")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AnimalModel>))]
-    public async Task<IActionResult> Search([FromQuery] AnimalSearchModel searchModel)
+    public async Task<ActionResult<List<AnimalModel>>> Search([FromQuery] AnimalSearchModel searchModel)
     {
         return Ok(await _animalService.Search(searchModel));
     }
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalModel))]
-    public async Task<IActionResult> Create([FromBody] AnimalCreateModel createModel)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult<AnimalModel>> Create([FromBody] AnimalCreateModel createModel)
     {
         return StatusCode(StatusCodes.Status201Created, await _animalService.Create(createModel));
     }
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPut("{animalId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalModel))]
-    public async Task<IActionResult> Update([FromRoute] long animalId, [FromBody] AnimalUpdateModel updateModel)
+    public async Task<ActionResult<AnimalModel>> Update(
+        [FromRoute] long animalId,
+        [FromBody] AnimalUpdateModel updateModel
+    )
     {
         return Ok(await _animalService.Update(animalId, updateModel));
     }
 
     [CheckRole(AccountRole.ADMIN)]
     [HttpDelete("{animalId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task Delete([FromRoute] long animalId)
+    public async Task<ActionResult> Delete([FromRoute] long animalId)
     {
         await _animalService.Delete(animalId);
+        return Ok();
     }
 
     #region AnimalType
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPost("{animalId:long}/types/{typeId:long}")]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalModel))]
-    public async Task<IActionResult> AddType([FromRoute] long animalId, [FromRoute] long typeId)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult<AnimalModel>> AddType([FromRoute] long animalId, [FromRoute] long typeId)
     {
         return StatusCode(StatusCodes.Status201Created, await _animalService.AddType(animalId, typeId));
     }
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPut("{animalId:long}/types")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalModel))]
-    public async Task<IActionResult> UpdateType(
+    public async Task<ActionResult<AnimalModel>> UpdateType(
         [FromRoute] long animalId,
         [FromBody] AnimalUpdateTypeModel updateTypeModel
     )
@@ -82,8 +80,7 @@ public class AnimalController : ControllerBase
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpDelete("{animalId:long}/types/{typeId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalModel))]
-    public async Task<IActionResult> DeleteType([FromRoute] long animalId, [FromRoute] long typeId)
+    public async Task<ActionResult<AnimalModel>> DeleteType([FromRoute] long animalId, [FromRoute] long typeId)
     {
         return Ok(await _animalService.DeleteType(animalId, typeId));
     }
@@ -93,8 +90,7 @@ public class AnimalController : ControllerBase
     #region AnimalLocation
 
     [HttpGet("{animalId:long}/locations")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<AnimalVisitedLocationModel>))]
-    public async Task<IActionResult> SearchLocation(
+    public async Task<ActionResult<List<AnimalVisitedLocationModel>>> SearchLocation(
         [FromRoute] long animalId,
         [FromQuery] AnimalSearchLocationModel searchLocationModel
     )
@@ -104,16 +100,18 @@ public class AnimalController : ControllerBase
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPost("{animalId:long}/locations/{pointId:long}")]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(AnimalVisitedLocationModel))]
-    public async Task<IActionResult> AddLocation([FromRoute] long animalId, [FromRoute] long pointId)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult<AnimalVisitedLocationModel>> AddLocation(
+        [FromRoute] long animalId,
+        [FromRoute] long pointId
+    )
     {
         return StatusCode(StatusCodes.Status201Created, await _animalService.AddLocation(animalId, pointId));
     }
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPut("{animalId:long}/locations")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AnimalVisitedLocationModel))]
-    public async Task<IActionResult> UpdateLocation(
+    public async Task<ActionResult<AnimalVisitedLocationModel>> UpdateLocation(
         [FromRoute] long animalId,
         [FromBody] AnimalUpdateLocationModel updateLocationModel
     )
@@ -123,10 +121,10 @@ public class AnimalController : ControllerBase
 
     [CheckRole(AccountRole.ADMIN)]
     [HttpDelete("{animalId:long}/locations/{visitedPointId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task DeleteLocation([FromRoute] long animalId, [FromRoute] long visitedPointId)
+    public async Task<ActionResult> DeleteLocation([FromRoute] long animalId, [FromRoute] long visitedPointId)
     {
         await _animalService.DeleteLocation(animalId, visitedPointId);
+        return Ok();
     }
 
     #endregion

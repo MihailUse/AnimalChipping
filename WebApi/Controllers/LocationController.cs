@@ -9,7 +9,6 @@ using WebApi.Attributes;
 namespace WebApi.Controllers;
 
 [Authorize]
-[ValidateIdentifier]
 [ApiController]
 [Route("locations")]
 public class LocationController : ControllerBase
@@ -22,31 +21,33 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetIdByPoint([FromQuery] PointModel model)
+    public async Task<ActionResult<string>> GetIdByPoint([FromQuery] PointModel model)
     {
         return Ok(await _locationService.GetIdByPoint(model));
     }
 
     [HttpGet("{locationId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationPointModel))]
-    public async Task<IActionResult> Get([FromRoute] int locationId)
+    public async Task<ActionResult<LocationPointModel>> Get([FromRoute] int locationId)
     {
         return Ok(await _locationService.Get(locationId));
     }
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LocationPointModel))]
-    public async Task<IActionResult> Create([FromBody] LocationPointCreateModel locationPointCreateModel)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    public async Task<ActionResult<LocationPointModel>> Create(
+        [FromBody] LocationPointCreateModel locationPointCreateModel
+    )
     {
         return StatusCode(StatusCodes.Status201Created, await _locationService.Create(locationPointCreateModel));
     }
 
     [CheckRole(AccountRole.ADMIN | AccountRole.CHIPPER)]
     [HttpPut("{pointId:long}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LocationPointModel))]
-    public async Task<IActionResult> Update([FromRoute] long pointId, [FromBody] LocationPointUpdateModel updateModel)
+    public async Task<ActionResult<LocationPointModel>> Update(
+        [FromRoute] long pointId,
+        [FromBody] LocationPointUpdateModel updateModel
+    )
     {
         return Ok(await _locationService.Update(pointId, updateModel));
     }
@@ -54,28 +55,26 @@ public class LocationController : ControllerBase
     [CheckRole(AccountRole.ADMIN)]
     [HttpDelete("{pointId:long}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task Delete([FromRoute] long pointId)
+    public async Task<ActionResult> Delete([FromRoute] long pointId)
     {
         await _locationService.Delete(pointId);
+        return Ok();
     }
 
     [HttpGet("geohash")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetOpenLocationCode([FromQuery] PointModel model)
+    public async Task<ActionResult<string>> GetOpenLocationCode([FromQuery] PointModel model)
     {
         return Ok(await _locationService.GetOpenLocationCode(model));
     }
 
     [HttpGet("geohashv2")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetOpenLocationCodeBase64([FromQuery] PointModel model)
+    public async Task<ActionResult<string>> GetOpenLocationCodeBase64([FromQuery] PointModel model)
     {
         return Ok(await _locationService.GetOpenLocationCodeBase64(model));
     }
 
     [HttpGet("geohashv3")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
-    public async Task<IActionResult> GetOpenLocationCodeHash([FromQuery] PointModel model)
+    public async Task<ActionResult<string>> GetOpenLocationCodeHash([FromQuery] PointModel model)
     {
         return Ok(await _locationService.GetOpenLocationCodeHash(model));
     }

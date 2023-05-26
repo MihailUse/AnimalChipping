@@ -1,3 +1,4 @@
+using System.Reflection;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -23,40 +24,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
         modelBuilder.HasPostgresEnum<AnimalLifeStatus>();
         modelBuilder.HasPostgresEnum<AccountRole>();
         modelBuilder.HasPostgresExtension("postgis");
-        
-        modelBuilder.Entity<Account>()
-            .HasIndex(x => x.Email)
-            .IsUnique();
 
-        modelBuilder.Entity<Account>().HasData(
-            new Account()
-            {
-                Id = 1,
-                FirstName = "adminFirstName",
-                LastName = "adminLastName",
-                Email = "admin@simbirsoft.com",
-                Password = "qwerty123",
-                Role = AccountRole.ADMIN
-            },
-            new Account()
-            {
-                Id = 2,
-                FirstName = "chipperFirstName",
-                LastName = "chipperLastName",
-                Email = "chipper@simbirsoft.com",
-                Password = "qwerty123",
-                Role = AccountRole.CHIPPER
-            },
-            new Account()
-            {
-                Id = 3,
-                FirstName = "userFirstName",
-                LastName = "userLastName",
-                Email = "user@simbirsoft.com",
-                Password = "qwerty123",
-                Role = AccountRole.USER
-            });
-
-        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

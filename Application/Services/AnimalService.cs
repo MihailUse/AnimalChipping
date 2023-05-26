@@ -110,7 +110,7 @@ internal class AnimalService : IAnimalService
                 .OrderBy(x => x.DateTimeOfVisitLocationPoint)
                 .FirstOrDefaultAsync(x => x.AnimalId == animalId);
             if (firstLocation?.LocationPointId == updateModel.ChippingLocationId)
-                throw new InvalidOperationException();
+                throw new BadOperationException();
         }
 
         animal = _mapper.Map(updateModel, animal);
@@ -132,7 +132,7 @@ internal class AnimalService : IAnimalService
 
         var hasVisitedLocation = await _database.AnimalVisitedLocations.AnyAsync(x => x.AnimalId == animalId);
         if (hasVisitedLocation)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         _database.Animals.Remove(animal);
         await _database.SaveChangesAsync();
@@ -186,7 +186,7 @@ internal class AnimalService : IAnimalService
         var animal = await FindFullAnimal(animalId);
 
         if (animal.AnimalTypes.Count == 1)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         var removedTypes = animal.AnimalTypes.RemoveAll(x => x.Id == typeId);
         if (removedTypes == 0)
@@ -230,7 +230,7 @@ internal class AnimalService : IAnimalService
             throw new NotFoundException("Animal not found");
 
         if (animal.LifeStatus == AnimalLifeStatus.DEAD)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         var location = await _database.LocationPoints.FindAsync(pointId);
         if (location == default)
@@ -240,11 +240,11 @@ internal class AnimalService : IAnimalService
         {
             var lastVisitedLocation = animal.VisitedLocations.First();
             if (lastVisitedLocation.LocationPointId == pointId)
-                throw new InvalidOperationException("Point already exists");
+                throw new BadOperationException("Point already exists");
         }
         else if (animal.ChippingLocationId == pointId)
         {
-            throw new InvalidOperationException("ChippingLocationId equals new point id");
+            throw new BadOperationException("ChippingLocationId equals new point id");
         }
 
         var animalVisitedLocation = new AnimalVisitedLocation()
@@ -281,23 +281,23 @@ internal class AnimalService : IAnimalService
             throw new NotFoundException("Visited location not found");
 
         if (visitedLocation.LocationPointId == updateLocationModel.LocationPointId)
-            throw new InvalidOperationException("Location already exists");
+            throw new BadOperationException("Location already exists");
 
         // check last visited point
         var lastVisitedLocation = animal.VisitedLocations
             .LastOrDefault(x => x.DateTimeOfVisitLocationPoint < visitedLocation.DateTimeOfVisitLocationPoint);
         if (lastVisitedLocation?.LocationPointId == updateLocationModel.LocationPointId)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         // check next visited point
         var nextVisitedLocation = animal.VisitedLocations
             .FirstOrDefault(x => x.DateTimeOfVisitLocationPoint > visitedLocation.DateTimeOfVisitLocationPoint);
         if (nextVisitedLocation?.LocationPointId == updateLocationModel.LocationPointId)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         // check ChippingLocationId not equals new location id 
         if (lastVisitedLocation == default && animal.ChippingLocationId == updateLocationModel.LocationPointId)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         visitedLocation.LocationPointId = updateLocationModel.LocationPointId;
         _database.AnimalVisitedLocations.Update(visitedLocation);
@@ -325,7 +325,7 @@ internal class AnimalService : IAnimalService
             .FirstOrDefault(x => x.DateTimeOfVisitLocationPoint > visitedLocation.DateTimeOfVisitLocationPoint);
         if ((lastVisitedLocation != default || nextVisitedLocation != default) &&
             lastVisitedLocation?.LocationPointId == nextVisitedLocation?.LocationPointId)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         // check ChippingLocationId not equals first location id
         if (nextVisitedLocation?.LocationPointId == animal.ChippingLocationId)

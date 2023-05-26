@@ -84,7 +84,7 @@ internal class LocationService : ILocationService
             x.ChippingLocationId == pointId ||
             x.VisitedLocations.Any(l => l.LocationPointId == pointId));
         if (hasAnimals)
-            throw new InvalidOperationException();
+            throw new BadOperationException();
 
         _database.LocationPoints.Remove(location);
         await _database.SaveChangesAsync();
